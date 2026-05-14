@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server"
 
+// Increase Vercel serverless function timeout to 30 seconds
+export const maxDuration = 30
+
 const BASE_URL = "https://hosting.glonasssoft.ru"
 const USERNAME = "grahatakanusantara"
 const PASSWORD = "gtn1234567"
