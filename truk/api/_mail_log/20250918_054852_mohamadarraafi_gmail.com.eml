@@ -1,0 +1,5 @@
+To: mohamadarraafi@gmail.com
+Subject: Reset Password OkeKirim
+Content-Type: text/html; charset=utf-8
+
+<div style="font-family:Inter,Arial,sans-serif;max-width:520px;margin:0 auto;color:#111"><h2>Reset Password</h2><p>Anda menerima email ini karena ada permintaan untuk mereset password akun OkeKirim Anda.</p><p>Silakan klik tombol di bawah ini untuk mengatur password baru:</p><p style="margin:16px 0"><a href="reset.html?token=e40c7025a1a2a14f3fe0db7a8b5bd09be06a037d7b2938602e768c18815f6bb1" style="background:#4f46e5;color:#fff;text-decoration:none;padding:10px 16px;border-radius:8px;display:inline-block">Atur Password</a></p><p>Atau salin tautan berikut ke browser Anda:<br><a href="reset.html?token=e40c7025a1a2a14f3fe0db7a8b5bd09be06a037d7b2938602e768c18815f6bb1">reset.html?token=e40c7025a1a2a14f3fe0db7a8b5bd09be06a037d7b2938602e768c18815f6bb1</a></p><p style="font-size:12px;color:#555">Tautan ini berlaku selama 24 jam.</p><p>Jika Anda tidak meminta reset password, abaikan email ini.</p><p>Terima kasih,<br>Tim OkeKirim</p></div>

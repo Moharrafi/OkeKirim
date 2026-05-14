@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="96" viewBox="0 0 320 96">
+    <defs>
+        <linearGradient id="okekirimGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#2563eb"/>
+            <stop offset="50%" stop-color="#3b82f6"/>
+            <stop offset="100%" stop-color="#22d3ee"/>
+        </linearGradient>
+        <linearGradient id="okekirimHighlight" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.85"/>
+            <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+        </linearGradient>
+        <filter id="okekirimShadow" x="-10%" y="-10%" width="120%" height="120%">
+            <feOffset dx="0" dy="6" in="SourceAlpha" result="shadowOffsetOuter1"/>
+            <feGaussianBlur stdDeviation="12" in="shadowOffsetOuter1" result="shadowBlurOuter1"/>
+            <feColorMatrix in="shadowBlurOuter1" type="matrix"
+                values="0 0 0 0 0
+                        0 0 0 0 0
+                        0 0 0 0 0
+                        0 0 0 0.18 0" result="shadowMatrix"/>
+            <feMerge>
+                <feMergeNode in="shadowMatrix"/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+    </defs>
+    <g filter="url(#okekirimShadow)">
+        <rect x="20" y="16" width="280" height="64" rx="18" fill="url(#okekirimGradient)"/>
+        <rect x="20" y="16" width="280" height="64" rx="18" fill="url(#okekirimHighlight)"/>
+        <g transform="translate(48 32)">
+            <path d="M0 16C0 7.163 7.163 0 16 0h16a4 4 0 0 1 0 8H16a8 8 0 0 0-8 8v16a4 4 0 0 1-8 0V16z"
+                  fill="#ffffff" opacity="0.85"/>
+            <path d="M40 40c-1.104 0-2-.896-2-2V10c0-1.105.896-2 2-2h12c10.493 0 18 7.507 18 18s-7.507 18-18 18h-12z"
+                  fill="#ffffff"/>
+            <circle cx="62" cy="26" r="6" fill="#2563eb"/>
+            <text x="88" y="32" font-family="'Inter', 'Segoe UI', sans-serif" font-size="28" font-weight="700"
+                  fill="#ffffff">OkeKirim
+            </text>
+            <text x="88" y="48" font-family="'Inter', 'Segoe UI', sans-serif" font-size="14" font-weight="500"
+                  letter-spacing="0.16em" fill="#e0f2fe">TRANSPORT PLATFORM
+            </text>
+        </g>
+    </g>
+</svg>
