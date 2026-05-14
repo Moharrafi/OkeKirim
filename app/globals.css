@@ -158,3 +158,35 @@ input[type="number"]::-webkit-outer-spin-button {
 .leaflet-popup-pane {
   z-index: 4;
 }
+
+/* Page transition animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Apply smooth animation to page content */
+.min-h-screen {
+  animation: fadeInUp 0.25s ease-out;
+}
+
+/* Smooth transitions for interactive elements */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Card hover/press animations */
+.active\:scale-95:active {
+  transition: transform 0.1s ease;
+}

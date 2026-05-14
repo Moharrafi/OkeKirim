@@ -578,7 +578,17 @@ export default function LokasiPage() {
                   <Clock className="h-4 w-4 mr-2" />
                   History
                 </Button>
-                <Button className="flex-1 h-11 rounded-xl bg-primary text-primary-foreground">
+                <Button
+                  className="flex-1 h-11 rounded-xl bg-primary text-primary-foreground"
+                  onClick={() => {
+                    if (selectedVehicleData && selectedVehicleData.lat !== 0) {
+                      window.open(
+                        `https://www.google.com/maps/dir/?api=1&destination=${selectedVehicleData.lat},${selectedVehicleData.lng}`,
+                        "_blank"
+                      )
+                    }
+                  }}
+                >
                   <Navigation className="h-4 w-4 mr-2" />
                   Navigasi
                 </Button>
