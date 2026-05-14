@@ -402,45 +402,6 @@ export default function ProfilePage() {
           </CardContent>
         </Card>
 
-        {/* Switch Account Type - For Demo */}
-        <Card className="border-chart-2/30 bg-chart-2/5">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 rounded-xl bg-chart-2/20">
-                <UserCog className="h-4 w-4 text-chart-2" />
-              </div>
-              <div>
-                <p className="font-medium text-foreground text-sm">Mode Demo</p>
-                <p className="text-xs text-muted-foreground">Ganti tampilan akun</p>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <Button
-                variant={isAdmin ? "default" : "outline"}
-                size="sm"
-                className={cn(
-                  "rounded-xl",
-                  isAdmin && "bg-primary text-primary-foreground"
-                )}
-                onClick={() => setUserRole("admin")}
-              >
-                Admin
-              </Button>
-              <Button
-                variant={isDriver ? "default" : "outline"}
-                size="sm"
-                className={cn(
-                  "rounded-xl",
-                  isDriver && "bg-primary text-primary-foreground"
-                )}
-                onClick={() => setUserRole("driver")}
-              >
-                Driver
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Logout Button */}
         <Button
           variant="outline"
