@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation"
 import { Home, Wallet, MapPin, History, User } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useUser } from "@/lib/user-context"
-import { useMemo } from "react"
+import { useMemo, useRef, useEffect, useState } from "react"
 
 const adminNavItems = [
   { href: "/", icon: Home, label: "Beranda" },
@@ -25,6 +25,8 @@ const driverNavItems = [
 export function MobileNav() {
   const pathname = usePathname()
   const { isAdmin, isAuthenticated } = useUser()
+  const navRef = useRef<HTMLDivElement>(null)
+  const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 })
 
   const navItems = isAdmin ? adminNavItems : driverNavItems
 
@@ -33,6 +35,18 @@ export function MobileNav() {
     return idx >= 0 ? idx : 0
   }, [pathname, navItems])
 
+  useEffect(() => {
+    if (navRef.current) {
+      const activeEl = navRef.current.children[activeIndex + 1] as HTMLElement // +1 because indicator is first child
+      if (activeEl) {
+        setIndicatorStyle({
+          left: activeEl.offsetLeft,
+          width: activeEl.offsetWidth,
+        })
+      }
+    }
+  }, [activeIndex])
+
   // Hide nav on login page or when not authenticated
   if (pathname === "/login" || !isAuthenticated) {
     return null
@@ -40,13 +54,17 @@ export function MobileNav() {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-lg safe-area-bottom">
-      <div className="relative flex items-center justify-around px-2 py-2">
+      <div
+        ref={navRef}
+        className="relative flex items-center py-2 px-1"
+        style={{ display: "grid", gridTemplateColumns: `repeat(${navItems.length}, 1fr)` }}
+      >
         {/* Animated active indicator */}
         <div
           className="absolute top-2 bottom-2 rounded-xl bg-primary/10 transition-all duration-300 ease-in-out"
           style={{
-            width: `calc(${100 / navItems.length}% - 8px)`,
-            left: `calc(${activeIndex * (100 / navItems.length)}% + 4px)`,
+            left: indicatorStyle.left,
+            width: indicatorStyle.width,
           }}
         />
 
@@ -57,7 +75,7 @@ export function MobileNav() {
               key={item.href}
               href={item.href}
               className={cn(
-                "relative z-10 flex flex-col items-center gap-1 rounded-xl px-3 py-2 transition-colors duration-200",
+                "relative z-10 flex flex-col items-center justify-center gap-1 rounded-xl py-2 transition-colors duration-200",
                 isActive
                   ? "text-primary"
                   : "text-muted-foreground hover:text-foreground"
