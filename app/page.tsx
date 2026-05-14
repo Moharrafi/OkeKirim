@@ -114,12 +114,19 @@ export default function DashboardPage() {
         <Card className="bg-gradient-to-br from-primary/20 via-primary/10 to-card border-primary/20 overflow-hidden relative">
           <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
           <CardContent className="p-4 relative">
-            <p className="text-sm text-muted-foreground">
-              {isAdmin ? "Pendapatan Perusahaan Bulan Ini (40%)" : "Pendapatan Bulan Ini (60%)"}
-            </p>
-            <p className="text-3xl font-bold text-foreground mt-1">
-              {loading ? "..." : `Rp ${formatRupiah(isAdmin ? (data?.monthlyCompanyShare || 0) : (data?.monthlyDriverShare || 0))}`}
-            </p>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">
+                  {isAdmin ? "Pendapatan Perusahaan Bulan Ini (40%)" : "Pendapatan Bulan Ini (60%)"}
+                </p>
+                <p className="text-3xl font-bold text-foreground mt-1">
+                  {loading ? "..." : `Rp ${formatRupiah(isAdmin ? (data?.monthlyCompanyShare || 0) : (data?.monthlyDriverShare || 0))}`}
+                </p>
+              </div>
+              <div className="p-3 rounded-2xl bg-white/30 dark:bg-white/10">
+                <Wallet className="h-8 w-8 text-primary" />
+              </div>
+            </div>
             <div className="flex items-center gap-1 mt-2">
               {data ? (() => {
                 const current = isAdmin ? data.monthlyCompanyShare : data.monthlyDriverShare

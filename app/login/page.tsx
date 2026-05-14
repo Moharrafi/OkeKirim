@@ -228,7 +228,7 @@ export default function LoginPage() {
                     </button>
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Contoh: B9289TDC (nopol tanpa spasi)
+                    Masukkan nopol tanpa spasi
                   </p>
                 </div>
               </>
@@ -266,16 +266,6 @@ export default function LoginPage() {
           </CardContent>
         </Card>
 
-        {/* Info */}
-        <Card className="border-primary/20 bg-primary/5 mt-4">
-          <CardContent className="p-4">
-            <p className="text-xs text-muted-foreground text-center">
-              {loginType === "admin"
-                ? "Login sebagai admin untuk mengelola setoran driver"
-                : "Pilih kendaraan lalu masukkan nopol tanpa spasi sebagai password"}
-            </p>
-          </CardContent>
-        </Card>
       </div>
 
       {/* Footer */}

@@ -17,6 +17,7 @@ import {
   Calendar,
   Filter,
   MapPin,
+  Wallet,
 } from "lucide-react"
 import {
   Select,
@@ -154,10 +155,9 @@ export default function HistoryPage() {
                   Rp {totalAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")}
                 </p>
               </div>
-              <Button size="sm" variant="outline" className="border-border gap-1.5">
-                <Download className="h-4 w-4" />
-                Export
-              </Button>
+              <div className="p-3 rounded-2xl bg-white/30 dark:bg-white/10">
+                <Wallet className="h-7 w-7 text-primary" />
+              </div>
             </div>
             <div className="flex gap-4 mt-3 pt-3 border-t border-border/50">
               <div>

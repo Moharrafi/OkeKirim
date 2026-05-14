@@ -38,17 +38,15 @@ export function MobileNav() {
     return null
   }
 
-  const itemWidth = 100 / navItems.length
-
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-lg safe-area-bottom">
       <div className="relative flex items-center justify-around px-2 py-2">
         {/* Animated active indicator */}
         <div
-          className="absolute top-2 h-[calc(100%-16px)] rounded-xl bg-primary/10 transition-all duration-300 ease-in-out"
+          className="absolute top-2 bottom-2 rounded-xl bg-primary/10 transition-all duration-300 ease-in-out"
           style={{
-            width: `${itemWidth - 4}%`,
-            left: `${activeIndex * itemWidth + 2}%`,
+            width: `calc(${100 / navItems.length}% - 8px)`,
+            left: `calc(${activeIndex * (100 / navItems.length)}% + 4px)`,
           }}
         />
 
