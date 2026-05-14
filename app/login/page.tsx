@@ -67,7 +67,7 @@ export default function LoginPage() {
     await new Promise((resolve) => setTimeout(resolve, 800))
 
     if (loginType === "admin") {
-      if (email === "admin@paskibrarent.id" && password === "admin123") {
+      if (email === "admin@okekirim.com" && password === "admin123") {
         login("admin")
         router.push("/")
       } else {
