@@ -16,6 +16,19 @@ if (session_status() === PHP_SESSION_NONE) {
 // Ensure users table exists and seed a default admin when empty (dev convenience)
 function ensure_users_table() {
     $pdo = db();
+    
+    // Check if users table exists with wrong structure (from old migrate.php)
+    try {
+        $check = $pdo->query("SHOW COLUMNS FROM users LIKE 'password_hash'");
+        $hasPasswordHash = $check->fetch();
+        if (!$hasPasswordHash) {
+            // Table exists but with wrong structure - drop and recreate
+            $pdo->exec("DROP TABLE IF EXISTS users");
+        }
+    } catch (Throwable $e) {
+        // Table doesn't exist yet, that's fine
+    }
+    
     $pdo->exec("CREATE TABLE IF NOT EXISTS users (
         id INT AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(255) DEFAULT NULL,
