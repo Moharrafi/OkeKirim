@@ -8,7 +8,8 @@ require __DIR__ . '/config.php';
 function run_migrations() {
     $flagFile = sys_get_temp_dir() . '/okekirim_migrated_' . md5(DB_HOST . DB_NAME) . '.flag';
     
-    // Skip if already migrated in this server session
+    // Skip if already migrated in this server session (cache 1 hour)
+    // Delete flag file manually or wait 1 hour to re-run migrations
     if (file_exists($flagFile) && (time() - filemtime($flagFile)) < 3600) {
         return;
     }
@@ -132,16 +133,8 @@ function run_migrations() {
     try { $pdo->exec("ALTER TABLE debt_payments MODIFY COLUMN created_at DATETIME DEFAULT CURRENT_TIMESTAMP"); } catch (Throwable $e) {}
     try { $pdo->exec("ALTER TABLE debt_payments MODIFY COLUMN id INT NOT NULL AUTO_INCREMENT"); } catch (Throwable $e) {}
     
-    // Users table (for auth)
-    $pdo->exec("CREATE TABLE IF NOT EXISTS users (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      username VARCHAR(128) NOT NULL UNIQUE,
-      password VARCHAR(255) NOT NULL,
-      name VARCHAR(255) DEFAULT NULL,
-      email VARCHAR(255) DEFAULT NULL,
-      role VARCHAR(32) DEFAULT 'admin',
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+    // Users table is managed by auth.php (ensure_users_table)
+    // No need to create it here;
     
     // Mark as migrated
     @file_put_contents($flagFile, date('Y-m-d H:i:s'));
