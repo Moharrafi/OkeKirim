@@ -4059,7 +4059,7 @@
 
         async function bootstrapFromAPI() {
             try {
-                const [dri, doc, srv, sch, deb, hist] = await Promise.all([
+                const results = await Promise.allSettled([
                     apiRequest('drivers.php'),
                     apiRequest('documents.php'),
                     apiRequest('services.php'),
@@ -4067,6 +4067,13 @@
                     apiRequest('debts.php'),
                     apiRequest('documents.php?action=history')
                 ]);
+                const [driR, docR, srvR, schR, debR, histR] = results;
+                const dri = driR.status === 'fulfilled' ? driR.value : null;
+                const doc = docR.status === 'fulfilled' ? docR.value : null;
+                const srv = srvR.status === 'fulfilled' ? srvR.value : null;
+                const sch = schR.status === 'fulfilled' ? schR.value : null;
+                const deb = debR.status === 'fulfilled' ? debR.value : null;
+                const hist = histR.status === 'fulfilled' ? histR.value : null;
                 if (Array.isArray(dri)) { drivers = dri; localStorage.setItem('drivers', JSON.stringify(drivers)); }
                 if (Array.isArray(doc)) { documents = doc; localStorage.setItem('documents', JSON.stringify(documents)); }
                 if (Array.isArray(srv)) {
