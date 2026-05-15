@@ -73,13 +73,13 @@ export async function GET(request: NextRequest) {
       [now.getFullYear(), ...driverParam]
     )
 
-    // Per driver income this month (only for admin)
+    // Per driver income this month (only for admin) - semua orderan (lunas + nunggak)
     const [driverIncome] = driverFilter
       ? [[] as Array<{ driver: string; total: string | number }>]
       : await pool.execute(
           `SELECT s.driver, CAST(SUM(s.companyShare) AS UNSIGNED) as total 
            FROM schedules s 
-           WHERE s.status = 'lunas' AND s.date >= ?
+           WHERE s.date >= ?
            GROUP BY s.driver 
            ORDER BY total DESC 
            LIMIT 5`,
