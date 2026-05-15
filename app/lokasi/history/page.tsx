@@ -268,11 +268,11 @@ export default function VehicleHistoryPage() {
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <Clock className="h-4 w-4 text-primary" />
-                      <span className="text-sm font-semibold text-foreground">
+                      <span className="text-sm font-semibold text-primary">
                         {formatTime(trip.startTime)} - {formatTime(trip.endTime)}
                       </span>
                     </div>
-                    <span className="text-xs text-muted-foreground bg-secondary px-2 py-1 rounded-full">
+                    <span className="text-xs font-medium text-amber-700 dark:text-amber-400 bg-amber-100 dark:bg-amber-500/15 px-2 py-1 rounded-full">
                       {formatDuration(trip.duration)}
                     </span>
                   </div>

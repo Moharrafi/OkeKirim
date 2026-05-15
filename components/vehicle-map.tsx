@@ -25,6 +25,8 @@ interface VehicleMapProps {
   selectedVehicle: string | null
   onMarkerClick: (id: string) => void
   expanded?: boolean
+  fitAll?: boolean
+  onFitComplete?: () => void
 }
 
 function createIcon(color: string) {
@@ -111,7 +113,25 @@ function InvalidateSize({ expanded }: { expanded?: boolean }) {
   return null
 }
 
-export default function VehicleMap({ vehicles, selectedVehicle, onMarkerClick, expanded }: VehicleMapProps) {
+function FitAllVehicles({ vehicles, fitAll, onFitComplete }: { vehicles: Vehicle[]; fitAll?: boolean; onFitComplete?: () => void }) {
+  const map = useMap()
+  useEffect(() => {
+    if (!fitAll) return
+    const validVehicles = vehicles.filter(v => v.lat !== 0 && v.lng !== 0)
+    if (validVehicles.length === 0) {
+      onFitComplete?.()
+      return
+    }
+    const bounds = L.latLngBounds(
+      validVehicles.map(v => [v.lat, v.lng] as [number, number])
+    )
+    map.flyToBounds(bounds, { padding: [30, 30], maxZoom: 13, duration: 0.8 })
+    onFitComplete?.()
+  }, [fitAll, vehicles, map, onFitComplete])
+  return null
+}
+
+export default function VehicleMap({ vehicles, selectedVehicle, onMarkerClick, expanded, fitAll, onFitComplete }: VehicleMapProps) {
   const selectedData = vehicles.find((v) => v.id === selectedVehicle) || null
 
   return (
@@ -127,6 +147,7 @@ export default function VehicleMap({ vehicles, selectedVehicle, onMarkerClick, e
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
       />
       <FitBounds vehicles={vehicles} />
+      <FitAllVehicles vehicles={vehicles} fitAll={fitAll} onFitComplete={onFitComplete} />
       <FlyToVehicle vehicle={selectedData} />
       <InvalidateSize expanded={expanded} />
       {vehicles.filter(v => v.lat !== 0 && v.lng !== 0).map((vehicle) => (

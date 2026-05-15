@@ -111,6 +111,7 @@ export default function LokasiPage() {
   const [mapExpanded, setMapExpanded] = useState(false)
   const [lastFetch, setLastFetch] = useState<Date | null>(null)
   const [refreshing, setRefreshing] = useState(false)
+  const [fitAllMarkers, setFitAllMarkers] = useState(false)
 
   useEffect(() => {
     const isAuth = localStorage.getItem("isAuthenticated")
@@ -182,6 +183,12 @@ export default function LokasiPage() {
   }, [fetchVehicles])
 
   const handleMarkerClick = (vehicleId: string) => {
+    // Klik dari map: hanya zoom ke marker, tidak munculkan popup detail
+    setSelectedVehicle(null)
+  }
+
+  const handleListClick = (vehicleId: string) => {
+    // Klik dari daftar kendaraan: munculkan popup detail
     setSelectedVehicle(vehicleId)
   }
 
@@ -289,7 +296,13 @@ export default function LokasiPage() {
           ].map((filter) => (
             <button
               key={filter.key}
-              onClick={() => setActiveFilter(filter.key)}
+              onClick={() => {
+                setActiveFilter(filter.key)
+                if (filter.key === "all") {
+                  setFitAllMarkers(true)
+                  setSelectedVehicle(null)
+                }
+              }}
               className={cn(
                 "flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all",
                 activeFilter === filter.key
@@ -318,6 +331,8 @@ export default function LokasiPage() {
               selectedVehicle={selectedVehicle}
               onMarkerClick={handleMarkerClick}
               expanded={mapExpanded}
+              fitAll={fitAllMarkers}
+              onFitComplete={() => setFitAllMarkers(false)}
             />
 
             {/* Map Controls */}
@@ -365,7 +380,7 @@ export default function LokasiPage() {
                   "border-border bg-card transition-all cursor-pointer hover:border-primary/50",
                   selectedVehicle === vehicle.id && "border-primary ring-2 ring-primary/20"
                 )}
-                onClick={() => handleMarkerClick(vehicle.id)}
+                onClick={() => handleListClick(vehicle.id)}
               >
                 <CardContent className="p-4">
                   <div className="flex items-start gap-3">
@@ -484,10 +499,10 @@ export default function LokasiPage() {
         <>
           {/* Backdrop overlay */}
           <div
-            className="fixed inset-0 z-40 bg-black/20 animate-in fade-in duration-200"
+            className="fixed inset-0 z-[55] bg-black/20 animate-in fade-in duration-200"
             onClick={() => setSelectedVehicle(null)}
           />
-          <div className="fixed inset-x-0 bottom-0 z-50 pb-20 animate-in slide-in-from-bottom-4 duration-300">
+          <div className="fixed inset-x-0 bottom-0 z-[60] pb-20 animate-in slide-in-from-bottom-4 duration-300">
           <Card className="mx-4 border-border bg-card shadow-2xl">
             <CardContent className="p-4">
               <div className="flex items-start justify-between mb-4">
@@ -563,23 +578,23 @@ export default function LokasiPage() {
                 </div>
               </div>
 
-              <div className="flex gap-2">
-                <Button variant="outline" className="flex-1 h-11 rounded-xl border-border">
-                  <Phone className="h-4 w-4 mr-2" />
-                  Telepon
+              <div className="grid grid-cols-3 gap-2">
+                <Button variant="outline" className="h-11 rounded-xl border-border text-xs sm:text-sm px-2">
+                  <Phone className="h-4 w-4 mr-1 shrink-0" />
+                  <span className="truncate">Telepon</span>
                 </Button>
                 <Button
                   variant="outline"
-                  className="flex-1 h-11 rounded-xl border-border"
+                  className="h-11 rounded-xl border-border text-xs sm:text-sm px-2"
                   onClick={() => {
                     router.push(`/lokasi/history?id=${selectedVehicleData.id}&name=${encodeURIComponent(selectedVehicleData.driver)}`)
                   }}
                 >
-                  <Clock className="h-4 w-4 mr-2" />
-                  History
+                  <Clock className="h-4 w-4 mr-1 shrink-0" />
+                  <span className="truncate">History</span>
                 </Button>
                 <Button
-                  className="flex-1 h-11 rounded-xl bg-primary text-primary-foreground"
+                  className="h-11 rounded-xl bg-primary text-primary-foreground text-xs sm:text-sm px-2"
                   onClick={() => {
                     if (selectedVehicleData && selectedVehicleData.lat !== 0) {
                       window.open(
@@ -589,8 +604,8 @@ export default function LokasiPage() {
                     }
                   }}
                 >
-                  <Navigation className="h-4 w-4 mr-2" />
-                  Navigasi
+                  <Navigation className="h-4 w-4 mr-1 shrink-0" />
+                  <span className="truncate">Navigasi</span>
                 </Button>
               </div>
             </CardContent>
