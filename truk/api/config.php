@@ -1,4 +1,7 @@
 <?php
+// Start output buffering to prevent "headers already sent" errors
+ob_start();
+
 // Basic DB config. Update credentials to match your environment.
 // Automatically picks local vs hosting defaults but still honours DB_* environment variables when present.
 
@@ -104,19 +107,19 @@ if (!$runningLocally) {
 }
 
 $localDefaults = [
-    'DB_HOST' => '',
-    'DB_PORT' => '26140',
-    'DB_NAME' => 'okekirim',
-    'DB_USER' => '',
-    'DB_PASS' => '',
+    'DB_HOST' => getenv('DB_HOST') ?: 'localhost',
+    'DB_PORT' => getenv('DB_PORT') ?: '3306',
+    'DB_NAME' => getenv('DB_NAME') ?: 'okekirim',
+    'DB_USER' => getenv('DB_USER') ?: 'root',
+    'DB_PASS' => getenv('DB_PASS') ?: '',
 ];
 
 $hostingDefaults = [
-    'DB_HOST' => '',
-    'DB_PORT' => '26140',
-    'DB_NAME' => 'okekirim',
-    'DB_USER' => '',
-    'DB_PASS' => '',
+    'DB_HOST' => getenv('DB_HOST') ?: 'localhost',
+    'DB_PORT' => getenv('DB_PORT') ?: '3306',
+    'DB_NAME' => getenv('DB_NAME') ?: 'okekirim',
+    'DB_USER' => getenv('DB_USER') ?: 'root',
+    'DB_PASS' => getenv('DB_PASS') ?: '',
 ];
 
 // Override DB_* env vars to customise connection without touching code.
@@ -135,26 +138,34 @@ foreach ($defaults as $key => $value) {
 }
 
 if (!defined('DB_PORT')) {
-    define('DB_PORT', '26140');
+    define('DB_PORT', '3306');
 }
 
 function db() {
     static $pdo = null;
     if ($pdo) return $pdo;
-    $port = defined('DB_PORT') ? DB_PORT : '26140';
+    $port = defined('DB_PORT') ? DB_PORT : '3306';
     $dsn = 'mysql:host=' . DB_HOST . ';port=' . $port . ';dbname=' . DB_NAME . ';charset=utf8mb4';
     $options = [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false,
     ];
-    $pdo = new PDO($dsn, DB_USER, DB_PASS, $options);
-    // Align MySQL session timezone with PHP default to keep stored timestamps consistent
-    $pdo->exec("SET time_zone = '+07:00'");
+    try {
+        $pdo = new PDO($dsn, DB_USER, DB_PASS, $options);
+        // Align MySQL session timezone with PHP default to keep stored timestamps consistent
+        $pdo->exec("SET time_zone = '+07:00'");
+    } catch (PDOException $e) {
+        json_response(['error' => 'Database connection failed: ' . $e->getMessage()], 500);
+    }
     return $pdo;
 }
 
 function json_response($data, $code = 200) {
+    // Clean any previous output to prevent "headers already sent" errors
+    if (ob_get_level()) {
+        ob_end_clean();
+    }
     header('Content-Type: application/json');
     header('Access-Control-Allow-Origin: *');
     header('Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS');
