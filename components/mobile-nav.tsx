@@ -53,7 +53,7 @@ export function MobileNav() {
   }
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-lg safe-area-bottom">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-lg safe-area-bottom" aria-label="Navigasi utama" role="navigation">
       <div
         ref={navRef}
         className="relative flex items-center py-2 px-1"
@@ -66,6 +66,7 @@ export function MobileNav() {
             left: indicatorStyle.left,
             width: indicatorStyle.width,
           }}
+          aria-hidden="true"
         />
 
         {navItems.map((item) => {
@@ -74,6 +75,8 @@ export function MobileNav() {
             <Link
               key={item.href}
               href={item.href}
+              aria-label={item.label}
+              aria-current={isActive ? "page" : undefined}
               className={cn(
                 "relative z-10 flex flex-col items-center justify-center gap-1 rounded-xl py-2 transition-colors duration-200",
                 isActive
@@ -86,6 +89,7 @@ export function MobileNav() {
                   "h-5 w-5 transition-transform duration-300",
                   isActive && "scale-110"
                 )}
+                aria-hidden="true"
               />
               <span
                 className={cn(

@@ -323,7 +323,7 @@ export default function HistoryPage() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="w-12 h-1.5 rounded-full bg-muted mx-auto mt-3 sticky top-0" />
-            <div className="p-4 pt-2 pb-8">
+            <div className="p-4 pt-2 pb-24">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-bold text-foreground">Detail Transaksi</h2>
                 <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setSelectedTx(null)}>
