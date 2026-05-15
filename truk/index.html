@@ -4042,10 +4042,12 @@
             try {
                 return JSON.parse(text);
             } catch (parseErr) {
+                // Try to extract JSON object {...} or array [...] from response with PHP warnings prepended
                 const firstBrace = text.indexOf('{');
-                const lastBrace = text.lastIndexOf('}');
-                if (firstBrace !== -1 && lastBrace > firstBrace) {
-                    const candidate = text.slice(firstBrace, lastBrace + 1);
+                const firstBracket = text.indexOf('[');
+                const jsonStart = (firstBrace === -1) ? firstBracket : (firstBracket === -1) ? firstBrace : Math.min(firstBrace, firstBracket);
+                if (jsonStart !== -1) {
+                    const candidate = text.slice(jsonStart);
                     try {
                         return JSON.parse(candidate);
                     } catch (innerErr) {
