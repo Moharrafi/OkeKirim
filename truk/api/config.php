@@ -108,7 +108,7 @@ if (!$runningLocally) {
 
 $localDefaults = [
     'DB_HOST' => getenv('DB_HOST') ?: 'localhost',
-    'DB_PORT' => getenv('DB_PORT') ?: '3306',
+    'DB_PORT' => getenv('DB_PORT') ?: '26140',
     'DB_NAME' => getenv('DB_NAME') ?: 'okekirim',
     'DB_USER' => getenv('DB_USER') ?: 'root',
     'DB_PASS' => getenv('DB_PASS') ?: '',
@@ -116,7 +116,7 @@ $localDefaults = [
 
 $hostingDefaults = [
     'DB_HOST' => getenv('DB_HOST') ?: 'localhost',
-    'DB_PORT' => getenv('DB_PORT') ?: '3306',
+    'DB_PORT' => getenv('DB_PORT') ?: '26140',
     'DB_NAME' => getenv('DB_NAME') ?: 'okekirim',
     'DB_USER' => getenv('DB_USER') ?: 'root',
     'DB_PASS' => getenv('DB_PASS') ?: '',
@@ -138,13 +138,13 @@ foreach ($defaults as $key => $value) {
 }
 
 if (!defined('DB_PORT')) {
-    define('DB_PORT', '3306');
+    define('DB_PORT', '26140');
 }
 
 function db() {
     static $pdo = null;
     if ($pdo) return $pdo;
-    $port = defined('DB_PORT') ? DB_PORT : '3306';
+    $port = defined('DB_PORT') ? DB_PORT : '26140';
     $dsn = 'mysql:host=' . DB_HOST . ';port=' . $port . ';dbname=' . DB_NAME . ';charset=utf8mb4';
     $options = [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
