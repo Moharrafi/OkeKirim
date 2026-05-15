@@ -2,21 +2,6 @@
 require __DIR__ . '/config.php';
 $pdo = db();
 
-$pdo->exec("CREATE TABLE IF NOT EXISTS services (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  vehicle VARCHAR(128) DEFAULT NULL,
-  driver VARCHAR(255) DEFAULT NULL,
-  type VARCHAR(128) DEFAULT NULL,
-  date DATE DEFAULT NULL,
-  cost INT DEFAULT NULL,
-  status VARCHAR(32) DEFAULT 'terjadwal',
-  receipt LONGTEXT DEFAULT NULL,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
-
-try { $pdo->exec("ALTER TABLE services ADD COLUMN receipt LONGTEXT DEFAULT NULL"); } catch (Throwable $e) { }
-try { $pdo->exec("ALTER TABLE services MODIFY COLUMN created_at DATETIME DEFAULT CURRENT_TIMESTAMP"); } catch (Throwable $e) { }
-
 function request_payload() {
     static $payload = null;
     if ($payload !== null) {

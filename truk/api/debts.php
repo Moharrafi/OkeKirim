@@ -2,42 +2,6 @@
 require __DIR__ . '/config.php';
 $pdo = db();
 
-$pdo->exec("CREATE TABLE IF NOT EXISTS debts (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  driver VARCHAR(255) DEFAULT NULL,
-  vehicle VARCHAR(128) DEFAULT NULL,
-  type VARCHAR(64) DEFAULT 'kasbon',
-  amount INT DEFAULT 0,
-  date DATE DEFAULT NULL,
-  dueDate DATE DEFAULT NULL,
-  status VARCHAR(32) DEFAULT 'belum_lunas',
-  paidAmount INT DEFAULT 0,
-  lastPaidAt DATETIME DEFAULT NULL,
-  paidOffAt DATETIME DEFAULT NULL,
-  notes TEXT DEFAULT NULL,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
-
-$pdo->exec("CREATE TABLE IF NOT EXISTS debt_payments (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  debt_id INT NOT NULL,
-  driver VARCHAR(255) DEFAULT NULL,
-  amount INT NOT NULL DEFAULT 0,
-  paid_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  notes TEXT DEFAULT NULL,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_debt_payments_debt FOREIGN KEY (debt_id) REFERENCES debts(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
-
-try { $pdo->exec("ALTER TABLE debts MODIFY COLUMN created_at DATETIME DEFAULT CURRENT_TIMESTAMP"); } catch (Throwable $e) { /* ignore */ }
-try { $pdo->exec("ALTER TABLE debt_payments MODIFY COLUMN created_at DATETIME DEFAULT CURRENT_TIMESTAMP"); } catch (Throwable $e) { /* ignore */ }
-try { $pdo->exec("ALTER TABLE debt_payments MODIFY COLUMN id INT NOT NULL AUTO_INCREMENT"); } catch (Throwable $e) { /* ignore */ }
-try {
-    $maxId = (int)$pdo->query('SELECT COALESCE(MAX(id), 0) AS max_id FROM debt_payments')->fetch()['max_id'];
-    $nextId = $maxId + 1;
-    $pdo->exec('ALTER TABLE debt_payments AUTO_INCREMENT = ' . max(1, $nextId));
-} catch (Throwable $e) { /* ignore */ }
-
 function transform_debt_row($row) {
     if (!is_array($row)) {
         return $row;

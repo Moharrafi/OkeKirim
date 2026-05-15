@@ -2,31 +2,6 @@
 require __DIR__ . '/config.php';
 $pdo = db();
 
-$pdo->exec("CREATE TABLE IF NOT EXISTS documents (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  vehicle VARCHAR(128) DEFAULT NULL,
-  type VARCHAR(128) DEFAULT NULL,
-  expiry DATE DEFAULT NULL,
-  renewalCost INT DEFAULT NULL,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
-
-$pdo->exec("CREATE TABLE IF NOT EXISTS document_renewals (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  document_id INT DEFAULT NULL,
-  vehicle VARCHAR(128) DEFAULT NULL,
-  driver VARCHAR(255) DEFAULT NULL,
-  type VARCHAR(128) DEFAULT NULL,
-  previous_expiry DATE DEFAULT NULL,
-  new_expiry DATE DEFAULT NULL,
-  cost INT DEFAULT NULL,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  INDEX idx_document (document_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
-
-try { $pdo->exec("ALTER TABLE documents MODIFY COLUMN created_at DATETIME DEFAULT CURRENT_TIMESTAMP"); } catch (Throwable $e) { /* ignore */ }
-try { $pdo->exec("ALTER TABLE document_renewals MODIFY COLUMN created_at DATETIME DEFAULT CURRENT_TIMESTAMP"); } catch (Throwable $e) { /* ignore */ }
-
 function okekirim_driver_name_by_vehicle(PDO $pdo, ?string $vehicle): ?string {
     static $cache = [];
     if (!$vehicle) {

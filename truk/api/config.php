@@ -230,3 +230,6 @@ function send_email($to, $subject, $html, $from = null) {
     } catch (Throwable $e) { /* ignore */ }
     return true;
 }
+
+// Run migrations once (cached for 1 hour)
+require_once __DIR__ . '/migrate.php';

@@ -2,39 +2,6 @@
 require __DIR__ . '/config.php';
 $pdo = db();
 
-$pdo->exec("CREATE TABLE IF NOT EXISTS schedules (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  driver VARCHAR(255) DEFAULT NULL,
-  vehicle VARCHAR(128) DEFAULT NULL,
-  date DATE DEFAULT NULL,
-  origin VARCHAR(255) DEFAULT NULL,
-  destination VARCHAR(255) DEFAULT NULL,
-  rit VARCHAR(32) DEFAULT NULL,
-  orderType VARCHAR(32) DEFAULT 'online',
-  fare INT DEFAULT 0,
-  status VARCHAR(32) DEFAULT 'nunggak',
-  companyShare INT DEFAULT 0,
-  paidCompanyAmount INT DEFAULT 0,
-  notes TEXT DEFAULT NULL,
-  payment_notes TEXT DEFAULT NULL,
-  lastPaidAt DATETIME DEFAULT NULL,
-  paidOffAt DATETIME DEFAULT NULL,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
-
-try {
-    $pdo->exec("ALTER TABLE schedules ADD COLUMN payment_notes TEXT DEFAULT NULL");
-} catch (Throwable $e) { /* ignore */ }
-try {
-    $pdo->exec("ALTER TABLE schedules ADD COLUMN lastPaidAt DATETIME DEFAULT NULL");
-} catch (Throwable $e) { /* ignore */ }
-try {
-    $pdo->exec("ALTER TABLE schedules ADD COLUMN paidOffAt DATETIME DEFAULT NULL");
-} catch (Throwable $e) { /* ignore */ }
-try {
-    $pdo->exec("ALTER TABLE schedules MODIFY COLUMN created_at DATETIME DEFAULT CURRENT_TIMESTAMP");
-} catch (Throwable $e) { /* ignore */ }
-
 function transform_schedule_row($row) {
     if (!is_array($row)) {
         return $row;

@@ -2,23 +2,6 @@
 require __DIR__ . '/config.php';
 $pdo = db();
 
-// Ensure table
-$pdo->exec("CREATE TABLE IF NOT EXISTS drivers (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(255) NOT NULL,
-  phone VARCHAR(64) DEFAULT NULL,
-  email VARCHAR(255) DEFAULT NULL,
-  address TEXT DEFAULT NULL,
-  vehicle VARCHAR(128) DEFAULT NULL,
-  vehicleType VARCHAR(64) DEFAULT NULL,
-  vehicleYear VARCHAR(16) DEFAULT NULL,
-  status VARCHAR(32) DEFAULT 'aktif',
-  joinDate DATE DEFAULT NULL,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
-
-try { $pdo->exec("ALTER TABLE drivers MODIFY COLUMN created_at DATETIME DEFAULT CURRENT_TIMESTAMP"); } catch (Throwable $e) { /* ignore */ }
-
 $method = $_SERVER['REQUEST_METHOD'];
 // Method override support for hosts that block PUT/DELETE
 if ($method === 'POST') {
