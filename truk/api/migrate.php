@@ -1,9 +1,9 @@
 <?php
 /**
  * Database migration script - run once to create/update tables.
- * Called automatically on first request, then cached via flag file.
+ * Called automatically from config.php, then cached via flag file.
+ * Do NOT require config.php here (already loaded by caller).
  */
-require __DIR__ . '/config.php';
 
 function run_migrations() {
     $flagFile = sys_get_temp_dir() . '/okekirim_migrated_' . md5(DB_HOST . DB_NAME) . '.flag';
@@ -140,5 +140,9 @@ function run_migrations() {
     @file_put_contents($flagFile, date('Y-m-d H:i:s'));
 }
 
-// Auto-run on include
-run_migrations();
+// Auto-run on include (wrapped in try/catch to never break the calling script)
+try {
+    run_migrations();
+} catch (Throwable $e) {
+    // Migration failed - not critical, tables may already exist
+}

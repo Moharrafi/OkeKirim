@@ -231,5 +231,8 @@ function send_email($to, $subject, $html, $from = null) {
     return true;
 }
 
-// Run migrations once (cached for 1 hour)
-require_once __DIR__ . '/migrate.php';
+// Run migrations once (cached for 1 hour) - skip for auth to avoid circular issues
+$_scriptName = basename($_SERVER['SCRIPT_FILENAME'] ?? '');
+if ($_scriptName !== 'auth.php') {
+    require_once __DIR__ . '/migrate.php';
+}
