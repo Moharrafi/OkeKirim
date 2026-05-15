@@ -8,8 +8,10 @@ const pool = mysql.createPool({
   database: process.env.DB_NAME || "okekirim",
   ssl: { rejectUnauthorized: false },
   waitForConnections: true,
-  connectionLimit: 5,
+  connectionLimit: 10,
   queueLimit: 0,
+  enableKeepAlive: true,
+  keepAliveInitialDelay: 10000,
 })
 
 export default pool

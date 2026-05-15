@@ -1,11 +1,21 @@
 import { NextRequest, NextResponse } from "next/server"
 import pool from "@/lib/db"
 
+// Simple in-memory cache (TTL: 20 seconds)
+const historyCache = new Map<string, { data: unknown; timestamp: number }>()
+const CACHE_TTL = 20_000
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const driver = searchParams.get("driver")
-  const dateFrom = searchParams.get("from") // YYYY-MM-DD
-  const dateTo = searchParams.get("to") // YYYY-MM-DD
+  const dateFrom = searchParams.get("from")
+  const dateTo = searchParams.get("to")
+
+  const cacheKey = `history_${driver}_${dateFrom}_${dateTo}`
+  const cached = historyCache.get(cacheKey)
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    return NextResponse.json(cached.data)
+  }
 
   try {
     let query = `
@@ -40,10 +50,22 @@ export async function GET(request: NextRequest) {
       vehicle: row.vehicle || row.driverVehicle || null,
     }))
 
-    return NextResponse.json({
+    const responseData = {
       history,
       count: history.length,
-    })
+    }
+
+    // Update cache
+    historyCache.set(cacheKey, { data: responseData, timestamp: Date.now() })
+    // Cleanup old entries
+    if (historyCache.size > 30) {
+      const now = Date.now()
+      for (const [k, v] of historyCache) {
+        if (now - v.timestamp > CACHE_TTL) historyCache.delete(k)
+      }
+    }
+
+    return NextResponse.json(responseData)
   } catch (error) {
     console.error("DB Error:", error)
     return NextResponse.json({ error: `Database error: ${error}` }, { status: 500 })

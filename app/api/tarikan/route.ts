@@ -1,10 +1,39 @@
 import { NextRequest, NextResponse } from "next/server"
 import pool from "@/lib/db"
 
+// Simple in-memory cache (TTL: 15 seconds)
+const queryCache = new Map<string, { data: unknown; timestamp: number }>()
+const CACHE_TTL = 15_000
+
+function getCached(key: string) {
+  const entry = queryCache.get(key)
+  if (entry && Date.now() - entry.timestamp < CACHE_TTL) {
+    return entry.data
+  }
+  return null
+}
+
+function setCache(key: string, data: unknown) {
+  queryCache.set(key, { data, timestamp: Date.now() })
+  // Cleanup old entries
+  if (queryCache.size > 50) {
+    const now = Date.now()
+    for (const [k, v] of queryCache) {
+      if (now - v.timestamp > CACHE_TTL) queryCache.delete(k)
+    }
+  }
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const filter = searchParams.get("filter") // "pending" | "paid" | "all"
   const driver = searchParams.get("driver") // filter by driver name
+
+  const cacheKey = `tarikan_${filter}_${driver}`
+  const cached = getCached(cacheKey)
+  if (cached) {
+    return NextResponse.json(cached)
+  }
 
   try {
     let query = `
@@ -39,10 +68,14 @@ export async function GET(request: NextRequest) {
       vehicle: row.vehicle || row.driverVehicle || null,
     }))
 
-    return NextResponse.json({
+    const responseData = {
       schedules,
       count: schedules.length,
-    })
+    }
+
+    setCache(cacheKey, responseData)
+
+    return NextResponse.json(responseData)
   } catch (error) {
     console.error("DB Error:", error)
     return NextResponse.json({ error: `Database error: ${error}` }, { status: 500 })
@@ -78,6 +111,9 @@ export async function POST(request: NextRequest) {
     )
 
     const insertId = (result as { insertId: number }).insertId
+
+    // Clear cache after new data is inserted
+    queryCache.clear()
 
     return NextResponse.json({ success: true, id: insertId }, { status: 201 })
   } catch (error) {
