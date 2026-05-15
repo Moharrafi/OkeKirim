@@ -2,6 +2,10 @@
 // Start output buffering to prevent "headers already sent" errors
 ob_start();
 
+// Suppress PHP warnings/notices from appearing in output (keep only fatal errors)
+error_reporting(E_ERROR | E_PARSE);
+ini_set('display_errors', '0');
+
 // Basic DB config. Update credentials to match your environment.
 // Automatically picks local vs hosting defaults but still honours DB_* environment variables when present.
 
