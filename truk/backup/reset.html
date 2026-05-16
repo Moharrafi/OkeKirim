@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reset Password - OkeKirim</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-white rounded-2xl shadow-xl p-6">
+        <div class="text-center mb-6">
+            <img src="img/okekirim.png" alt="OkeKirim" class="w-14 h-14 object-contain mx-auto mb-2">
+            <h1 class="text-xl font-bold">Reset Password</h1>
+            <p class="text-sm text-gray-600">Masukkan password baru Anda</p>
+        </div>
+
+        <form id="resetForm" class="space-y-4">
+            <input type="hidden" id="token">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Password Baru</label>
+                <input type="password" id="password" required class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500" placeholder="Password baru">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Konfirmasi Password</label>
+                <input type="password" id="confirm" required class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500" placeholder="Ulangi password baru">
+            </div>
+            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg transition-colors">Ganti Password</button>
+        </form>
+
+        <p class="text-center text-xs text-gray-500 mt-4">© 2024 OkeKirim</p>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl">
+            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800 mb-2" id="modalTitle">Berhasil!</h3>
+            <p class="text-gray-600 mb-6 text-sm" id="modalMessage">Password berhasil diubah.</p>
+            <button id="backToLogin" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-colors text-sm font-semibold">Kembali ke Login</button>
+        </div>
+    </div>
+
+    <script>
+        function qs(name) {
+            var m = location.search.match(new RegExp('[?&]'+name+'=([^&]+)'));
+            return m ? decodeURIComponent(m[1]) : '';
+        }
+        function showSuccess(title, message) {
+            try {
+                document.getElementById('modalTitle').textContent = title || 'Berhasil!';
+                document.getElementById('modalMessage').textContent = (message || 'Password berhasil diubah.') + ' Mengalihkan ke halaman login...';
+                document.getElementById('successModal').classList.remove('hidden');
+                setTimeout(function(){ window.location.href = 'login.html'; }, 1800);
+            } catch (e) {}
+        }
+        document.getElementById('backToLogin').addEventListener('click', function(){ window.location.href = 'login.html'; });
+
+        document.addEventListener('DOMContentLoaded', function(){
+            var t = qs('token');
+            document.getElementById('token').value = t;
+        });
+
+        document.getElementById('resetForm').addEventListener('submit', async function(e){
+            e.preventDefault();
+            var token = document.getElementById('token').value.trim();
+            var pass = document.getElementById('password').value;
+            var conf = document.getElementById('confirm').value;
+            if (!token) return alert('Token tidak valid.');
+            if (!pass || pass.length < 6) return alert('Password minimal 6 karakter');
+            if (pass !== conf) return alert('Konfirmasi password tidak cocok');
+            var btn = this.querySelector('button[type="submit"]');
+            var orig = btn.textContent;
+            btn.textContent = 'Memproses...'; btn.disabled = true;
+            try {
+                var body = new URLSearchParams({ token: token, password: pass });
+                var res = await fetch('api/auth.php?action=reset', { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body });
+                var data = await res.json().catch(function(){return {};});
+                if (res.ok && data && data.success) {
+                    showSuccess('Password Berhasil Diubah', 'Silakan login dengan password baru Anda.');
+                } else {
+                    alert((data && data.message) ? data.message : 'Gagal reset password');
+                }
+            } catch (e) {
+                alert('Tidak dapat terhubung ke server');
+            } finally {
+                btn.textContent = orig; btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
