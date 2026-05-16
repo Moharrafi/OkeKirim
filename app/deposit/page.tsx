@@ -262,7 +262,7 @@ export default function DepositPage() {
           onBack={() => setShowBatchPayment(false)} 
         />
         
-        <div className="px-4 py-4 space-y-4">
+        <div className="px-4 py-4 pb-28 space-y-4">
           {/* Selected Orders Summary */}
           <Card className="border-border bg-card">
             <CardContent className="p-4">
@@ -396,7 +396,7 @@ export default function DepositPage() {
           onBack={() => setSelectedOrder(null)} 
         />
         
-        <div className="px-4 py-4 space-y-4">
+        <div className="px-4 py-4 pb-28 space-y-4">
           {/* Order Detail Card */}
           <Card className="border-border bg-card">
             <CardContent className="p-4">
