@@ -230,7 +230,7 @@ export default function VehicleHistoryPage() {
               <CardContent className="p-3 text-center">
                 <Route className="h-5 w-5 text-primary mx-auto mb-1" />
                 <p className="text-lg font-bold text-foreground">
-                  {historyData.totalDistance.toFixed(1)}
+                  {(historyData.totalDistance || 0).toFixed(1)}
                 </p>
                 <p className="text-xs text-muted-foreground">km</p>
               </CardContent>
@@ -305,7 +305,7 @@ export default function VehicleHistoryPage() {
                     <div className="flex items-center gap-1.5 text-xs">
                       <Route className="h-3.5 w-3.5 text-primary" />
                       <span className="font-medium text-foreground">
-                        {trip.distance.toFixed(1)} km
+                        {(trip.distance || 0).toFixed(1)} km
                       </span>
                     </div>
                     <div className="flex items-center gap-1.5 text-xs">
