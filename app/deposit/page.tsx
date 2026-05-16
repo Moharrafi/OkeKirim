@@ -887,10 +887,10 @@ export default function DepositPage() {
                       }
                     }}
                     className={cn(
-                      "text-xs font-medium px-3 py-1.5 rounded-full transition-all",
+                      "text-xs font-medium px-3 py-1.5 rounded-full transition-all border",
                       isBatchMode 
-                        ? "bg-primary text-primary-foreground" 
-                        : "bg-secondary text-muted-foreground"
+                        ? "bg-primary text-primary-foreground border-primary" 
+                        : "bg-card text-foreground border-border hover:border-primary/50"
                     )}
                   >
                     <div className="flex items-center gap-1">
@@ -899,7 +899,7 @@ export default function DepositPage() {
                     </div>
                   </button>
                 )}
-                <span className="text-xs text-muted-foreground bg-secondary px-2 py-1 rounded-full">
+                <span className="text-xs font-medium text-foreground bg-card border border-border px-2 py-1 rounded-full">
                   {orders.length} orderan
                 </span>
               </div>
