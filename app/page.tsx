@@ -109,24 +109,24 @@ export default function DashboardPage() {
       <MobileHeader showGreeting />
 
       <div className="px-4 py-4 space-y-5">
-        {/* Balance Card */}
-        <Card className="bg-gradient-to-br from-primary/20 via-primary/10 to-card border-primary/20 overflow-hidden relative">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-          <CardContent className="p-4 relative">
-            <div className="flex items-center justify-between">
+        {/* Balance Card - highlighted hero */}
+        <Card className="bg-primary/[0.07] dark:bg-primary/15 border-primary/20 overflow-hidden relative">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+          <CardContent className="p-5 py-6 relative">
+            <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-primary/70 dark:text-primary/80">
                   {isAdmin ? "Pendapatan Perusahaan Bulan Ini (40%)" : "Pendapatan Bulan Ini (60%)"}
                 </p>
-                <p className="text-3xl font-bold text-foreground mt-1">
+                <p className="text-[1.75rem] font-extrabold text-foreground mt-1 tracking-tight">
                   {loading ? "..." : `Rp ${formatRupiah(isAdmin ? (data?.monthlyCompanyShare || 0) : (data?.monthlyDriverShare || 0))}`}
                 </p>
               </div>
-              <div className="p-3 rounded-2xl bg-white/30 dark:bg-white/10">
-                <Wallet className="h-8 w-8 text-primary" />
+              <div className="p-3 rounded-2xl bg-primary/10 dark:bg-primary/20 mt-4">
+                <Wallet className="h-6 w-6 text-primary" />
               </div>
             </div>
-            <div className="flex items-center gap-1 mt-2">
+            <div className="flex items-center gap-1.5 mt-2">
               {data ? (() => {
                 const current = isAdmin ? data.monthlyCompanyShare : data.monthlyDriverShare
                 const last = isAdmin ? data.lastMonthCompanyShare : data.lastMonthDriverShare
@@ -134,32 +134,32 @@ export default function DashboardPage() {
                 const isUp = current >= last
                 return (
                   <>
-                    {isUp ? <ArrowUpRight className="h-4 w-4 text-success" /> : <ArrowDownRight className="h-4 w-4 text-destructive" />}
-                    <span className={cn("text-sm font-medium", isUp ? "text-success" : "text-destructive")}>
+                    {isUp ? <ArrowUpRight className="h-3.5 w-3.5 text-success" /> : <ArrowDownRight className="h-3.5 w-3.5 text-destructive" />}
+                    <span className={cn("text-xs font-semibold", isUp ? "text-success" : "text-destructive")}>
                       {isUp ? "+" : ""}{pct}%
                     </span>
-                    <span className="text-sm text-muted-foreground">dari bulan lalu</span>
+                    <span className="text-xs text-muted-foreground">dari bulan lalu</span>
                   </>
                 )
               })() : (
-                <span className="text-sm text-muted-foreground">Memuat...</span>
+                <span className="text-xs text-muted-foreground">Memuat...</span>
               )}
             </div>
           </CardContent>
         </Card>
 
-        {/* Quick Actions */}
-        <div className="flex gap-3">
+        {/* Quick Actions - refined with icon glow */}
+        <div className="grid grid-cols-3 gap-3">
           {quickActions.map((action) => (
             <Link
               key={action.href}
               href={action.href}
-              className="flex-1 flex flex-col items-center gap-2 p-3 rounded-2xl bg-card border border-border active:scale-95 transition-transform"
+              className="flex flex-col items-center gap-2.5 p-4 rounded-2xl bg-card border border-border active:scale-[0.97] transition-all"
             >
-              <div className={cn("p-2.5 rounded-xl", action.color)}>
+              <div className={cn("p-3 rounded-xl", action.color, "shadow-sm")}>
                 <action.icon className="h-5 w-5 text-white" />
               </div>
-              <span className="text-xs font-medium text-foreground">{action.label}</span>
+              <span className="text-[11px] font-semibold text-foreground">{action.label}</span>
             </Link>
           ))}
         </div>
@@ -176,95 +176,87 @@ export default function DashboardPage() {
 
         {!loading && (
         <>
-        {/* Stats Grid */}
+        {/* Stats Grid - compact premium */}
         <div className="grid grid-cols-2 gap-3">
           <Card className="border-border bg-card">
-            <CardContent className="p-3">
+            <CardContent className="p-3.5">
               <div className="flex items-center justify-between">
                 <div className="p-2 rounded-xl bg-primary/10">
                   <Wallet className="h-4 w-4 text-primary" />
                 </div>
                 {data && data.lastMonthCompanyShare > 0 && (
-                  <div className="flex items-center gap-0.5">
-                    {data.monthlyCompanyShare >= data.lastMonthCompanyShare ? (
-                      <ArrowUpRight className="h-3 w-3 text-success" />
-                    ) : (
-                      <ArrowDownRight className="h-3 w-3 text-destructive" />
-                    )}
-                    <span className={cn("text-xs font-medium", data.monthlyCompanyShare >= data.lastMonthCompanyShare ? "text-success" : "text-destructive")}>
-                      {Math.abs(Math.round(((data.monthlyCompanyShare - data.lastMonthCompanyShare) / data.lastMonthCompanyShare) * 100))}%
-                    </span>
-                  </div>
+                  <span className={cn("text-[11px] font-semibold", data.monthlyCompanyShare >= data.lastMonthCompanyShare ? "text-success" : "text-destructive")}>
+                    {data.monthlyCompanyShare >= data.lastMonthCompanyShare ? "↑" : "↓"}{Math.abs(Math.round(((data.monthlyCompanyShare - data.lastMonthCompanyShare) / data.lastMonthCompanyShare) * 100))}%
+                  </span>
                 )}
               </div>
-              <p className="text-lg font-bold text-foreground mt-2">
+              <p className="text-lg font-bold text-foreground mt-2 tracking-tight">
                 {loading ? "..." : `Rp ${formatRupiah(data?.monthlyCompanyShare || 0)}`}
               </p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-[11px] text-muted-foreground">
                 {isAdmin ? "Masuk Perusahaan (40%)" : "Wajib Setor (40%)"}
               </p>
             </CardContent>
           </Card>
 
           <Card className="border-border bg-card">
-            <CardContent className="p-3">
+            <CardContent className="p-3.5">
               <div className="flex items-center justify-between">
                 <div className="p-2 rounded-xl bg-chart-2/10">
                   {isAdmin ? <Users className="h-4 w-4 text-chart-2" /> : <Car className="h-4 w-4 text-chart-2" />}
                 </div>
+                {data && data.monthlyCount > 0 && (
+                  <span className="text-[11px] font-semibold text-muted-foreground">
+                    {data.monthlyCount} trip
+                  </span>
+                )}
               </div>
-              <p className="text-lg font-bold text-foreground mt-2">
+              <p className="text-lg font-bold text-foreground mt-2 tracking-tight">
                 {loading ? "..." : isAdmin ? (data?.activeDrivers || 0) : (data?.monthlyCount || 0)}
               </p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-[11px] text-muted-foreground">
                 {isAdmin ? "Driver Aktif" : "Trip Bulan Ini"}
               </p>
             </CardContent>
           </Card>
 
           <Card className="border-border bg-card">
-            <CardContent className="p-3">
+            <CardContent className="p-3.5">
               <div className="flex items-center justify-between">
                 <div className="p-2 rounded-xl bg-warning/10">
                   <Clock className="h-4 w-4 text-warning" />
                 </div>
                 {data && data.pendingTotal > 0 && (
-                  <div className="flex items-center gap-0.5">
-                    <ArrowDownRight className="h-3 w-3 text-warning" />
-                    <span className="text-xs font-medium text-warning">
-                      Rp {formatRupiah(data.pendingTotal)}
-                    </span>
-                  </div>
+                  <span className="text-[11px] font-semibold text-warning">
+                    Rp {formatRupiah(data.pendingTotal)}
+                  </span>
                 )}
               </div>
-              <p className="text-lg font-bold text-foreground mt-2">
+              <p className="text-lg font-bold text-foreground mt-2 tracking-tight">
                 {loading ? "..." : data?.pendingCount || 0}
               </p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-[11px] text-muted-foreground">
                 {isAdmin ? "Belum Disetor" : "Hutang Setoran"}
               </p>
             </CardContent>
           </Card>
 
           <Card className="border-border bg-card">
-            <CardContent className="p-3">
+            <CardContent className="p-3.5">
               <div className="flex items-center justify-between">
                 <div className="p-2 rounded-xl bg-success/10">
                   <TrendingUp className="h-4 w-4 text-success" />
                 </div>
                 {data && data.todayCount > 0 && (
-                  <div className="flex items-center gap-0.5">
-                    <ArrowUpRight className="h-3 w-3 text-success" />
-                    <span className="text-xs font-medium text-success">
-                      +{data.todayCount} trip
-                    </span>
-                  </div>
+                  <span className="text-[11px] font-semibold text-success">
+                    +{data.todayCount} trip
+                  </span>
                 )}
               </div>
-              <p className="text-lg font-bold text-foreground mt-2">
+              <p className="text-lg font-bold text-foreground mt-2 tracking-tight">
                 {loading ? "..." : `Rp ${formatRupiah(data?.todayTotal || 0)}`}
               </p>
-              <p className="text-xs text-muted-foreground">Hari Ini</p>
+              <p className="text-[11px] text-muted-foreground">Hari Ini</p>
             </CardContent>
           </Card>
         </div>
@@ -283,10 +275,10 @@ export default function DashboardPage() {
         {/* Recent Transactions */}
         <div>
           <div className="flex items-center justify-between mb-3">
-            <h2 className="font-semibold text-foreground">Transaksi Terbaru</h2>
-            <Link href="/history" className="flex items-center text-sm text-primary">
+            <h2 className="text-sm font-bold uppercase tracking-wide text-foreground">Transaksi Terbaru</h2>
+            <Link href="/history" className="flex items-center text-xs font-semibold text-primary">
               Lihat Semua
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="h-3.5 w-3.5" />
             </Link>
           </div>
           <Card className="border-border bg-card">
@@ -295,11 +287,11 @@ export default function DashboardPage() {
                 <div className="p-4 text-center text-sm text-muted-foreground">Memuat...</div>
               ) : data?.recentTransactions && data.recentTransactions.length > 0 ? (
                 data.recentTransactions.map((tx) => (
-                  <div key={tx.id} className="flex items-center justify-between p-3">
+                  <div key={tx.id} className="flex items-center justify-between p-3.5">
                     <div className="flex items-center gap-3">
                       <div
                         className={cn(
-                          "p-2 rounded-xl",
+                          "p-2.5 rounded-xl",
                           tx.orderType === "online" ? "bg-primary/10" : "bg-chart-3/10"
                         )}
                       >
@@ -310,19 +302,19 @@ export default function DashboardPage() {
                         )}
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-foreground">{tx.driver}</p>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-sm font-semibold text-foreground">{tx.driver}</p>
+                        <p className="text-[11px] text-muted-foreground mt-0.5">
                           {tx.origin} → {tx.destination}
                         </p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-semibold text-foreground">
+                      <p className="text-sm font-bold text-foreground tracking-tight">
                         Rp {formatRupiah(tx.companyShare)}
                       </p>
                       <p
                         className={cn(
-                          "text-xs font-medium",
+                          "text-[11px] font-semibold mt-0.5",
                           tx.status === "lunas" ? "text-success" : "text-warning"
                         )}
                       >

@@ -157,8 +157,34 @@ export default function DepositPage() {
     }
   }
 
-  const handleSubmitDeposit = () => {
+  const handleSubmitDeposit = async () => {
     setIsSubmittingDeposit(true)
+    
+    // Send Telegram notification
+    try {
+      const order = selectedOrder || (selectedOrders.length > 0 ? orders.find(o => selectedOrders.includes(o.id)) : null)
+      const totalAmount = showBatchPayment ? batchTotal : (selectedOrder?.sisa || 0)
+      const driverName = order?.driver || user.name
+      const route = order ? `${order.lokasiMuat} → ${order.lokasiBongkar}` : "-"
+      const type = order?.type || "online"
+      const fare = order?.argo || 0
+
+      await fetch("/api/telegram", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          driver: driverName,
+          amount: totalAmount,
+          route: showBatchPayment ? `${selectedOrders.length} orderan (batch)` : route,
+          orderType: type,
+          fare: showBatchPayment ? batchTotal : fare,
+          imageBase64: uploadedImage || undefined,
+        }),
+      })
+    } catch {
+      // Don't block deposit if Telegram fails
+    }
+
     setTimeout(() => {
       setIsSubmittingDeposit(false)
       setShowDepositSuccess(true)
@@ -171,7 +197,7 @@ export default function DepositPage() {
         setUploadedFile(null)
         setUploadedImage(null)
       }, 2000)
-    }, 1500)
+    }, 1000)
   }
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {

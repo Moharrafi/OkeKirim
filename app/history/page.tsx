@@ -144,33 +144,34 @@ export default function HistoryPage() {
       
       <div className="px-4 py-4 space-y-4">
         {/* Summary */}
-        <Card className="bg-gradient-to-br from-primary/20 via-primary/10 to-card border-primary/20">
-          <CardContent className="p-4">
+        <Card className="bg-primary/[0.07] dark:bg-primary/15 border-primary/20 overflow-hidden relative">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+          <CardContent className="p-4 relative">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-primary/70 dark:text-primary/80">
                   {isDriver ? "Total Disetor" : "Total Berhasil"}
                 </p>
-                <p className="text-2xl font-bold text-foreground">
+                <p className="text-[1.75rem] font-extrabold text-foreground mt-1 tracking-tight">
                   Rp {totalAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")}
                 </p>
               </div>
-              <div className="p-3 rounded-2xl bg-white/30 dark:bg-white/10">
-                <Wallet className="h-7 w-7 text-primary" />
+              <div className="p-3 rounded-2xl bg-primary/10 dark:bg-primary/20">
+                <Wallet className="h-6 w-6 text-primary" />
               </div>
             </div>
-            <div className="flex gap-4 mt-3 pt-3 border-t border-border/50">
+            <div className="flex gap-4 mt-3 pt-3 border-t border-primary/10">
               <div>
-                <p className="text-xs text-muted-foreground">Total Trip</p>
-                <p className="text-lg font-semibold text-foreground">{totalTrips}</p>
+                <p className="text-[11px] text-muted-foreground">Total Trip</p>
+                <p className="text-lg font-bold text-foreground">{totalTrips}</p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Lunas</p>
-                <p className="text-lg font-semibold text-success">{lunasCount}</p>
+                <p className="text-[11px] text-muted-foreground">Lunas</p>
+                <p className="text-lg font-bold text-success">{lunasCount}</p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Belum Setor</p>
-                <p className="text-lg font-semibold text-warning">{nunggakCount}</p>
+                <p className="text-[11px] text-muted-foreground">Belum Setor</p>
+                <p className="text-lg font-bold text-warning">{nunggakCount}</p>
               </div>
             </div>
           </CardContent>
