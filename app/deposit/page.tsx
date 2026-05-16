@@ -1106,11 +1106,29 @@ export default function DepositPage() {
                           Sisa: Rp {order.sisa.toLocaleString("id-ID")}
                         </p>
                       </div>
-                      {order.paidAmount > 0 && (
-                        <span className="text-xs text-muted-foreground bg-secondary px-2 py-1 rounded-full">
-                          Terbayar: Rp {order.paidAmount.toLocaleString("id-ID")}
-                        </span>
-                      )}
+                      <div className="flex items-center gap-1">
+                        {order.paidAmount > 0 && (
+                          <span className="text-xs text-muted-foreground bg-secondary px-2 py-1 rounded-full">
+                            Terbayar: Rp {order.paidAmount.toLocaleString("id-ID")}
+                          </span>
+                        )}
+                        {isAdmin && !isBatchMode && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              if (confirm(`Hapus orderan ${order.id}?`)) {
+                                fetch(`/api/tarikan/${order.driverId}`, { method: "DELETE" })
+                                  .then(() => setApiOrders(prev => prev.filter(o => o.id !== order.id)))
+                                  .catch(() => {})
+                              }
+                            }}
+                            className="p-1.5 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                            aria-label="Hapus orderan"
+                          >
+                            <X className="h-3.5 w-3.5" />
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </CardContent>
                 </Card>

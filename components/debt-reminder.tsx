@@ -15,13 +15,13 @@ export function DebtReminder() {
   const [dismissed, setDismissed] = useState(false)
 
   useEffect(() => {
-    if (!isAuthenticated || dismissed) return
+    if (!isAuthenticated || dismissed || !isDriver) return
 
-    // Check for pending deposits
+    // Only show for drivers, not admin
     const checkPending = async () => {
       try {
         const params = new URLSearchParams({ filter: "pending" })
-        if (isDriver && user.name) {
+        if (user.name) {
           params.set("driver", user.name)
         }
         const res = await fetch(`/api/tarikan?${params.toString()}`)
@@ -35,7 +35,6 @@ export function DebtReminder() {
           setPendingCount(schedules.length)
           setPendingTotal(total)
           
-          // Show after a short delay for better UX
           setTimeout(() => setShow(true), 1500)
         }
       } catch {
@@ -70,7 +69,7 @@ export function DebtReminder() {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-foreground">
-                {isDriver ? "Kamu" : "Ada"} {pendingCount} orderan belum disetor
+                Kamu punya {pendingCount} orderan belum disetor
               </p>
               <p className="text-xs text-muted-foreground mt-0.5">
                 Total: Rp {pendingTotal.toLocaleString("id-ID")}
