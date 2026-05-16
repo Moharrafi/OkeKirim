@@ -160,6 +160,29 @@ export default function DepositPage() {
   const handleSubmitDeposit = async () => {
     setIsSubmittingDeposit(true)
     
+    // Determine which orders to mark as paid
+    const orderIds = showBatchPayment
+      ? selectedOrders.map(id => {
+          const order = orders.find(o => o.id === id)
+          return order ? parseInt(order.driverId) : 0
+        }).filter(id => id > 0)
+      : selectedOrder
+        ? [parseInt(selectedOrder.driverId)]
+        : []
+
+    // Update payment status in database
+    try {
+      if (orderIds.length > 0) {
+        await fetch("/api/tarikan/pay", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ids: orderIds, paymentNotes: "Lunas" }),
+        })
+      }
+    } catch {
+      // Continue even if DB update fails
+    }
+
     // Send Telegram notification
     try {
       const order = selectedOrder || (selectedOrders.length > 0 ? orders.find(o => selectedOrders.includes(o.id)) : null)
@@ -185,19 +208,17 @@ export default function DepositPage() {
       // Don't block deposit if Telegram fails
     }
 
+    setIsSubmittingDeposit(false)
+    setShowDepositSuccess(true)
     setTimeout(() => {
-      setIsSubmittingDeposit(false)
-      setShowDepositSuccess(true)
-      setTimeout(() => {
-        setShowDepositSuccess(false)
-        setSelectedOrder(null)
-        setSelectedOrders([])
-        setIsBatchMode(false)
-        setShowBatchPayment(false)
-        setUploadedFile(null)
-        setUploadedImage(null)
-      }, 2000)
-    }, 1000)
+      setShowDepositSuccess(false)
+      setSelectedOrder(null)
+      setSelectedOrders([])
+      setIsBatchMode(false)
+      setShowBatchPayment(false)
+      setUploadedFile(null)
+      setUploadedImage(null)
+    }, 2000)
   }
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
