@@ -75,26 +75,31 @@ export default function HistoryPage() {
   const [lunasCount, setLunasCount] = useState(0)
   const [nunggakCount, setNunggakCount] = useState(0)
 
+  const [currentPage, setCurrentPage] = useState(1)
+  const [hasMore, setHasMore] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const PAGE_SIZE = 20
+
   useEffect(() => {
     fetchDrivers().then(setApiDrivers).catch(() => {})
   }, [])
 
   useEffect(() => {
     setLoadingApi(true)
-    // If driver is logged in, auto-filter by their name
+    setCurrentPage(1)
+    setApiTransactions([])
+    setHasMore(true)
     const driverName = isDriver ? user.name : (filterDriver || undefined)
-    // Fetch ALL schedules (lunas + nunggak) for summary stats
+    // Fetch ALL schedules for summary counts only
     fetchSchedules(undefined, driverName)
       .then((allSchedules) => {
         const lunas = allSchedules.filter(s => s.status === "lunas")
         const nunggak = allSchedules.filter(s => s.status === "nunggak")
-        
-        // Store counts for summary
         setTotalTrips(allSchedules.length)
         setLunasCount(lunas.length)
         setNunggakCount(nunggak.length)
 
-        // Display only lunas in the list
+        // Display first page of lunas
         const mapped = lunas.map(s => ({
           id: `TRX-${String(s.id).padStart(3, "0")}`,
           date: s.date ? new Date(s.date).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }) : "-",
@@ -107,11 +112,25 @@ export default function HistoryPage() {
           method: s.payment_notes || s.paymentNotes || "Transfer",
           status: "success" as const,
         }))
-        setApiTransactions(mapped)
+        setApiTransactions(mapped.slice(0, PAGE_SIZE))
+        setHasMore(mapped.length > PAGE_SIZE)
+        // Store full list for load more
+        ;(window as unknown as Record<string, unknown>).__allTransactions = mapped
       })
       .catch(() => setApiTransactions([]))
       .finally(() => setLoadingApi(false))
   }, [filterDriver, filterDateFrom, filterDateTo, isDriver, user.name])
+
+  const handleLoadMore = () => {
+    setLoadingMore(true)
+    const allTx = (window as unknown as Record<string, unknown>).__allTransactions as typeof apiTransactions || []
+    const nextPage = currentPage + 1
+    const nextItems = allTx.slice(0, nextPage * PAGE_SIZE)
+    setApiTransactions(nextItems)
+    setCurrentPage(nextPage)
+    setHasMore(nextItems.length < allTx.length)
+    setLoadingMore(false)
+  }
 
   const transactions = apiTransactions
 
@@ -312,6 +331,20 @@ export default function HistoryPage() {
               </Card>
             </div>
           ))}
+
+          {/* Load More Button */}
+          {hasMore && !loadingApi && (
+            <div className="flex justify-center pt-4 pb-2">
+              <Button
+                variant="outline"
+                className="rounded-xl px-6"
+                onClick={handleLoadMore}
+                disabled={loadingMore}
+              >
+                {loadingMore ? "Memuat..." : `Muat Lagi (${apiTransactions.length} dari ${lunasCount})`}
+              </Button>
+            </div>
+          )}
         </div>
         )}
       </div>
