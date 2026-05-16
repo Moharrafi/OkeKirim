@@ -4,6 +4,7 @@ import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 import { MobileNav } from '@/components/mobile-nav'
 import { OfflineIndicator } from '@/components/offline-indicator'
+import { DebtReminder } from '@/components/debt-reminder'
 import { ThemeProvider } from '@/lib/theme-context'
 import { UserProvider } from '@/lib/user-context'
 
@@ -40,6 +41,7 @@ export default function RootLayout({
         <ThemeProvider>
           <UserProvider>
             <OfflineIndicator />
+            <DebtReminder />
             {children}
             <MobileNav />
           </UserProvider>
