@@ -415,9 +415,15 @@ export default function HistoryPage() {
                 </div>
               </div>
 
-              {selectedTx.status === "success" && (
-                <Button className="w-full mt-6 h-12 rounded-xl bg-primary text-primary-foreground">
-                  Download Bukti
+              {selectedTx.status === "success" && isDriver && (
+                <Button 
+                  className="w-full mt-6 h-12 rounded-xl bg-primary text-primary-foreground"
+                  onClick={() => {
+                    setSelectedTx(null)
+                    router.push("/deposit?tab=setoran")
+                  }}
+                >
+                  Lihat Detail
                 </Button>
               )}
               
