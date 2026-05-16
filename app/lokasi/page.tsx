@@ -118,11 +118,25 @@ export default function LokasiPage() {
     if (isAuth !== "true") {
       router.push("/login")
     }
+    // Restore cached vehicles data if available (prevents reload on back navigation)
+    const cached = sessionStorage.getItem("gps_vehicles")
+    if (cached) {
+      try {
+        const { vehicles: cachedVehicles, timestamp } = JSON.parse(cached)
+        // Use cache if less than 60 seconds old
+        if (Date.now() - timestamp < 60000 && cachedVehicles.length > 0) {
+          setVehicles(cachedVehicles)
+          setLastFetch(new Date(timestamp))
+          setLoading(false)
+          return
+        }
+      } catch {}
+    }
   }, [router])
 
   const fetchVehicles = useCallback(async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true)
-    else setLoading(true)
+    else if (vehicles.length === 0) setLoading(true)
     setError(null)
 
     try {
@@ -152,6 +166,8 @@ export default function LokasiPage() {
 
       setVehicles(mapped)
       setLastFetch(new Date())
+      // Cache for back navigation
+      sessionStorage.setItem("gps_vehicles", JSON.stringify({ vehicles: mapped, timestamp: Date.now() }))
 
       // Geocode addresses in background
       for (const v of mapped) {
