@@ -27,6 +27,8 @@ import {
   X,
   Image as ImageIcon,
   CheckSquare,
+  Trash2,
+  Pencil,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useUser } from "@/lib/user-context"
@@ -96,6 +98,10 @@ export default function DepositPage() {
   const [showDepositSuccess, setShowDepositSuccess] = useState(false)
   const [batchTotal, setBatchTotal] = useState(0)
   const [showConfirm, setShowConfirm] = useState(false)
+  const [editingOrder, setEditingOrder] = useState<Order | null>(null)
+  const [editArgo, setEditArgo] = useState("")
+  const [editOrigin, setEditOrigin] = useState("")
+  const [editDestination, setEditDestination] = useState("")
 
   // Fetch real data from OkeKirim API
   const [apiOrders, setApiOrders] = useState<Order[]>([])
@@ -1113,20 +1119,35 @@ export default function DepositPage() {
                           </span>
                         )}
                         {isAdmin && !isBatchMode && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              if (confirm(`Hapus orderan ${order.id}?`)) {
-                                fetch(`/api/tarikan/${order.driverId}`, { method: "DELETE" })
-                                  .then(() => setApiOrders(prev => prev.filter(o => o.id !== order.id)))
-                                  .catch(() => {})
-                              }
-                            }}
-                            className="p-1.5 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
-                            aria-label="Hapus orderan"
-                          >
-                            <X className="h-3.5 w-3.5" />
-                          </button>
+                          <>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                setEditingOrder(order)
+                                setEditArgo(String(order.argo))
+                                setEditOrigin(order.lokasiMuat)
+                                setEditDestination(order.lokasiBongkar)
+                              }}
+                              className="p-1.5 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
+                              aria-label="Edit orderan"
+                            >
+                              <Pencil className="h-3.5 w-3.5" />
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                if (confirm(`Hapus orderan ${order.id}?`)) {
+                                  fetch(`/api/tarikan/${order.driverId}`, { method: "DELETE" })
+                                    .then(() => setApiOrders(prev => prev.filter(o => o.id !== order.id)))
+                                    .catch(() => {})
+                                }
+                              }}
+                              className="p-1.5 rounded-lg hover:bg-destructive/10 text-red-400 hover:text-destructive transition-colors"
+                              aria-label="Hapus orderan"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          </>
                         )}
                       </div>
                     </div>
@@ -1148,6 +1169,86 @@ export default function DepositPage() {
           </>
         )}
       </div>
+
+      {/* Edit Order Modal */}
+      {editingOrder && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setEditingOrder(null)} />
+          <div className="relative bg-card border border-border rounded-2xl p-5 w-full max-w-sm shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-foreground">Edit Orderan</h3>
+              <button onClick={() => setEditingOrder(null)} className="p-1 rounded-full hover:bg-secondary">
+                <X className="h-4 w-4 text-muted-foreground" />
+              </button>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <Label className="text-xs font-medium text-muted-foreground">Lokasi Muat</Label>
+                <Input
+                  value={editOrigin}
+                  onChange={(e) => setEditOrigin(e.target.value)}
+                  className="bg-secondary border-0 h-10 rounded-xl mt-1"
+                />
+              </div>
+              <div>
+                <Label className="text-xs font-medium text-muted-foreground">Lokasi Bongkar</Label>
+                <Input
+                  value={editDestination}
+                  onChange={(e) => setEditDestination(e.target.value)}
+                  className="bg-secondary border-0 h-10 rounded-xl mt-1"
+                />
+              </div>
+              <div>
+                <Label className="text-xs font-medium text-muted-foreground">Nilai Argo</Label>
+                <Input
+                  type="number"
+                  value={editArgo}
+                  onChange={(e) => setEditArgo(e.target.value)}
+                  className="bg-secondary border-0 h-10 rounded-xl mt-1"
+                />
+              </div>
+            </div>
+            <div className="flex gap-3 mt-5">
+              <Button
+                variant="outline"
+                className="flex-1 h-10 rounded-xl"
+                onClick={() => setEditingOrder(null)}
+              >
+                Batal
+              </Button>
+              <Button
+                className="flex-1 h-10 rounded-xl bg-primary text-primary-foreground"
+                onClick={async () => {
+                  await fetch(`/api/tarikan/${editingOrder.driverId}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      driver: editingOrder.driver,
+                      origin: editOrigin,
+                      destination: editDestination,
+                      fare: parseInt(editArgo || "0"),
+                      orderType: editingOrder.type,
+                    }),
+                  })
+                  // Update local state
+                  const newCompanyShare = Math.round(parseInt(editArgo || "0") * 0.4)
+                  setApiOrders(prev => prev.map(o => o.id === editingOrder.id ? {
+                    ...o,
+                    lokasiMuat: editOrigin,
+                    lokasiBongkar: editDestination,
+                    argo: parseInt(editArgo || "0"),
+                    companyShare: newCompanyShare,
+                    sisa: newCompanyShare - o.paidAmount,
+                  } : o))
+                  setEditingOrder(null)
+                }}
+              >
+                Simpan
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Confirm Dialog */}
       <ConfirmDialog
