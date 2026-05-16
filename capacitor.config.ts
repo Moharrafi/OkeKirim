@@ -5,10 +5,7 @@ const config: CapacitorConfig = {
   appName: "OkeKirim Driver",
   webDir: "out",
   server: {
-    // Untuk development, arahkan ke server lokal
-    // Hapus/comment ini untuk production build
-    // url: "http://192.168.x.x:3000",
-    // cleartext: true,
+    url: "https://oke-kirim.vercel.app",
   },
   android: {
     buildOptions: {
