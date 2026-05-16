@@ -109,24 +109,25 @@ export default function DashboardPage() {
       <MobileHeader showGreeting />
 
       <div className="px-4 py-4 space-y-5">
-        {/* Balance Card */}
-        <Card className="bg-gradient-to-br from-primary/20 via-primary/10 to-card border-primary/20 overflow-hidden relative">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-          <CardContent className="p-4 relative">
+        {/* Balance Card - Premium gradient */}
+        <Card className="bg-gradient-to-br from-primary via-primary/90 to-emerald-700 dark:from-primary dark:via-primary/80 dark:to-emerald-900 border-0 overflow-hidden relative shadow-xl shadow-primary/20">
+          <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full blur-2xl translate-y-1/2 -translate-x-1/4" />
+          <CardContent className="p-5 relative">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-white/70">
                   {isAdmin ? "Pendapatan Perusahaan Bulan Ini (40%)" : "Pendapatan Bulan Ini (60%)"}
                 </p>
-                <p className="text-3xl font-bold text-foreground mt-1">
+                <p className="text-3xl font-bold text-white mt-1 tracking-tight">
                   {loading ? "..." : `Rp ${formatRupiah(isAdmin ? (data?.monthlyCompanyShare || 0) : (data?.monthlyDriverShare || 0))}`}
                 </p>
               </div>
-              <div className="p-3 rounded-2xl bg-white/30 dark:bg-white/10">
-                <Wallet className="h-8 w-8 text-primary" />
+              <div className="p-3.5 rounded-2xl bg-white/15 backdrop-blur-sm">
+                <Wallet className="h-7 w-7 text-white" />
               </div>
             </div>
-            <div className="flex items-center gap-1 mt-2">
+            <div className="flex items-center gap-1.5 mt-3">
               {data ? (() => {
                 const current = isAdmin ? data.monthlyCompanyShare : data.monthlyDriverShare
                 const last = isAdmin ? data.lastMonthCompanyShare : data.lastMonthDriverShare
@@ -134,29 +135,28 @@ export default function DashboardPage() {
                 const isUp = current >= last
                 return (
                   <>
-                    {isUp ? <ArrowUpRight className="h-4 w-4 text-success" /> : <ArrowDownRight className="h-4 w-4 text-destructive" />}
-                    <span className={cn("text-sm font-medium", isUp ? "text-success" : "text-destructive")}>
-                      {isUp ? "+" : ""}{pct}%
+                    <span className={cn("text-xs font-semibold px-2 py-0.5 rounded-full", isUp ? "bg-white/20 text-emerald-100" : "bg-red-500/20 text-red-200")}>
+                      {isUp ? "↑" : "↓"} {Math.abs(pct)}%
                     </span>
-                    <span className="text-sm text-muted-foreground">dari bulan lalu</span>
+                    <span className="text-sm text-white/60">dari bulan lalu</span>
                   </>
                 )
               })() : (
-                <span className="text-sm text-muted-foreground">Memuat...</span>
+                <span className="text-sm text-white/60">Memuat...</span>
               )}
             </div>
           </CardContent>
         </Card>
 
-        {/* Quick Actions */}
-        <div className="flex gap-3">
+        {/* Quick Actions - Glassmorphism style */}
+        <div className="grid grid-cols-3 gap-3">
           {quickActions.map((action) => (
             <Link
               key={action.href}
               href={action.href}
-              className="flex-1 flex flex-col items-center gap-2 p-3 rounded-2xl bg-card border border-border active:scale-95 transition-transform"
+              className="flex flex-col items-center gap-2.5 p-4 rounded-2xl bg-card border border-border hover:border-primary/30 active:scale-95 transition-all shadow-sm"
             >
-              <div className={cn("p-2.5 rounded-xl", action.color)}>
+              <div className={cn("p-3 rounded-xl shadow-lg", action.color)}>
                 <action.icon className="h-5 w-5 text-white" />
               </div>
               <span className="text-xs font-medium text-foreground">{action.label}</span>
@@ -176,95 +176,87 @@ export default function DashboardPage() {
 
         {!loading && (
         <>
-        {/* Stats Grid */}
+        {/* Stats Grid - More vibrant */}
         <div className="grid grid-cols-2 gap-3">
-          <Card className="border-border bg-card">
-            <CardContent className="p-3">
+          <Card className="border-border bg-card overflow-hidden relative">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-primary/50" />
+            <CardContent className="p-4">
               <div className="flex items-center justify-between">
-                <div className="p-2 rounded-xl bg-primary/10">
+                <div className="p-2.5 rounded-xl bg-primary/10">
                   <Wallet className="h-4 w-4 text-primary" />
                 </div>
                 {data && data.lastMonthCompanyShare > 0 && (
-                  <div className="flex items-center gap-0.5">
-                    {data.monthlyCompanyShare >= data.lastMonthCompanyShare ? (
-                      <ArrowUpRight className="h-3 w-3 text-success" />
-                    ) : (
-                      <ArrowDownRight className="h-3 w-3 text-destructive" />
-                    )}
-                    <span className={cn("text-xs font-medium", data.monthlyCompanyShare >= data.lastMonthCompanyShare ? "text-success" : "text-destructive")}>
-                      {Math.abs(Math.round(((data.monthlyCompanyShare - data.lastMonthCompanyShare) / data.lastMonthCompanyShare) * 100))}%
-                    </span>
-                  </div>
+                  <span className={cn("text-xs font-semibold px-1.5 py-0.5 rounded-md", data.monthlyCompanyShare >= data.lastMonthCompanyShare ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive")}>
+                    {data.monthlyCompanyShare >= data.lastMonthCompanyShare ? "↑" : "↓"}
+                    {Math.abs(Math.round(((data.monthlyCompanyShare - data.lastMonthCompanyShare) / data.lastMonthCompanyShare) * 100))}%
+                  </span>
                 )}
               </div>
-              <p className="text-lg font-bold text-foreground mt-2">
+              <p className="text-lg font-bold text-foreground mt-2.5">
                 {loading ? "..." : `Rp ${formatRupiah(data?.monthlyCompanyShare || 0)}`}
               </p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-muted-foreground mt-0.5">
                 {isAdmin ? "Masuk Perusahaan (40%)" : "Wajib Setor (40%)"}
               </p>
             </CardContent>
           </Card>
 
-          <Card className="border-border bg-card">
-            <CardContent className="p-3">
+          <Card className="border-border bg-card overflow-hidden relative">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-blue-400" />
+            <CardContent className="p-4">
               <div className="flex items-center justify-between">
-                <div className="p-2 rounded-xl bg-chart-2/10">
-                  {isAdmin ? <Users className="h-4 w-4 text-chart-2" /> : <Car className="h-4 w-4 text-chart-2" />}
+                <div className="p-2.5 rounded-xl bg-blue-500/10">
+                  {isAdmin ? <Users className="h-4 w-4 text-blue-500" /> : <Car className="h-4 w-4 text-blue-500" />}
                 </div>
               </div>
-              <p className="text-lg font-bold text-foreground mt-2">
+              <p className="text-lg font-bold text-foreground mt-2.5">
                 {loading ? "..." : isAdmin ? (data?.activeDrivers || 0) : (data?.monthlyCount || 0)}
               </p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-muted-foreground mt-0.5">
                 {isAdmin ? "Driver Aktif" : "Trip Bulan Ini"}
               </p>
             </CardContent>
           </Card>
 
-          <Card className="border-border bg-card">
-            <CardContent className="p-3">
+          <Card className="border-border bg-card overflow-hidden relative">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-500 to-amber-400" />
+            <CardContent className="p-4">
               <div className="flex items-center justify-between">
-                <div className="p-2 rounded-xl bg-warning/10">
-                  <Clock className="h-4 w-4 text-warning" />
+                <div className="p-2.5 rounded-xl bg-amber-500/10">
+                  <Clock className="h-4 w-4 text-amber-500" />
                 </div>
                 {data && data.pendingTotal > 0 && (
-                  <div className="flex items-center gap-0.5">
-                    <ArrowDownRight className="h-3 w-3 text-warning" />
-                    <span className="text-xs font-medium text-warning">
-                      Rp {formatRupiah(data.pendingTotal)}
-                    </span>
-                  </div>
+                  <span className="text-xs font-semibold text-amber-600 dark:text-amber-400">
+                    Rp {formatRupiah(data.pendingTotal)}
+                  </span>
                 )}
               </div>
-              <p className="text-lg font-bold text-foreground mt-2">
+              <p className="text-lg font-bold text-foreground mt-2.5">
                 {loading ? "..." : data?.pendingCount || 0}
               </p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-muted-foreground mt-0.5">
                 {isAdmin ? "Belum Disetor" : "Hutang Setoran"}
               </p>
             </CardContent>
           </Card>
 
-          <Card className="border-border bg-card">
-            <CardContent className="p-3">
+          <Card className="border-border bg-card overflow-hidden relative">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 to-emerald-400" />
+            <CardContent className="p-4">
               <div className="flex items-center justify-between">
-                <div className="p-2 rounded-xl bg-success/10">
-                  <TrendingUp className="h-4 w-4 text-success" />
+                <div className="p-2.5 rounded-xl bg-emerald-500/10">
+                  <TrendingUp className="h-4 w-4 text-emerald-500" />
                 </div>
                 {data && data.todayCount > 0 && (
-                  <div className="flex items-center gap-0.5">
-                    <ArrowUpRight className="h-3 w-3 text-success" />
-                    <span className="text-xs font-medium text-success">
-                      +{data.todayCount} trip
-                    </span>
-                  </div>
+                  <span className="text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-1.5 py-0.5 rounded-md">
+                    +{data.todayCount} trip
+                  </span>
                 )}
               </div>
-              <p className="text-lg font-bold text-foreground mt-2">
+              <p className="text-lg font-bold text-foreground mt-2.5">
                 {loading ? "..." : `Rp ${formatRupiah(data?.todayTotal || 0)}`}
               </p>
-              <p className="text-xs text-muted-foreground">Hari Ini</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Hari Ini</p>
             </CardContent>
           </Card>
         </div>
