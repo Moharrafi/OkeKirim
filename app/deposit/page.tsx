@@ -73,6 +73,7 @@ export default function DepositPage() {
   const [lokasiBongkar, setLokasiBongkar] = useState("")
   const [argo, setArgo] = useState("")
   const [orderType, setOrderType] = useState<OrderType>("online")
+  const [orderDate, setOrderDate] = useState(new Date().toISOString().split("T")[0])
   const [isSubmittingOrder, setIsSubmittingOrder] = useState(false)
   const [showOrderSuccess, setShowOrderSuccess] = useState(false)
 
@@ -137,6 +138,7 @@ export default function DepositPage() {
     const result = await createOrder({
       driver: driverData?.name || user.name,
       vehicle: driverData?.vehicle || undefined,
+      date: orderDate,
       origin: lokasiMuat,
       destination: lokasiBongkar,
       orderType: orderType,
@@ -153,6 +155,7 @@ export default function DepositPage() {
         setLokasiBongkar("")
         setArgo("")
         setOrderType("online")
+        setOrderDate(new Date().toISOString().split("T")[0])
       }, 2000)
     }
   }
@@ -720,6 +723,24 @@ export default function DepositPage() {
                 </CardContent>
               </Card>
             )}
+
+            {/* Date Input */}
+            <Card className="border-border bg-card">
+              <CardContent className="p-4">
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-foreground">Tanggal</Label>
+                  <div className="relative">
+                    <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      type="date"
+                      value={orderDate}
+                      onChange={(e) => setOrderDate(e.target.value)}
+                      className="bg-secondary border-0 pl-10 h-12 rounded-xl"
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
             {/* Location Input */}
             <Card className="border-border bg-card">
