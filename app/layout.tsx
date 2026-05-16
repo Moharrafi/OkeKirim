@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 import { MobileNav } from '@/components/mobile-nav'
+import { OfflineIndicator } from '@/components/offline-indicator'
 import { ThemeProvider } from '@/lib/theme-context'
 import { UserProvider } from '@/lib/user-context'
 
@@ -38,6 +39,7 @@ export default function RootLayout({
       <body className={`${inter.variable} font-sans antialiased`}>
         <ThemeProvider>
           <UserProvider>
+            <OfflineIndicator />
             {children}
             <MobileNav />
           </UserProvider>

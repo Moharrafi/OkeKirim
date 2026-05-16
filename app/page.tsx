@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils"
 import Link from "next/link"
 import { useUser } from "@/lib/user-context"
 import dynamic from "next/dynamic"
+import { SkeletonDashboard } from "@/components/skeleton-dashboard"
 
 // Lazy load chart components - only loaded when visible
 const DashboardCharts = dynamic(() => import("@/components/dashboard-charts"), {
@@ -164,15 +165,8 @@ export default function DashboardPage() {
           ))}
         </div>
 
-        {/* Loading Spinner */}
-        {loading && (
-          <div className="flex items-center justify-center py-12">
-            <div className="text-center">
-              <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-3" />
-              <p className="text-sm text-muted-foreground">Memuat data...</p>
-            </div>
-          </div>
-        )}
+        {/* Loading Skeleton */}
+        {loading && <SkeletonDashboard />}
 
         {!loading && (
         <>

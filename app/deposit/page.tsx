@@ -31,6 +31,7 @@ import {
 import { cn } from "@/lib/utils"
 import { useUser } from "@/lib/user-context"
 import { fetchSchedules, fetchPendingSchedules, fetchDrivers, createOrder, type Schedule, type Driver } from "@/lib/okekirim-api"
+import { ConfirmDialog } from "@/components/confirm-dialog"
 
 type MainTab = "orderan" | "setoran"
 type OrderType = "online" | "offline"
@@ -87,6 +88,7 @@ export default function DepositPage() {
   const [isSubmittingDeposit, setIsSubmittingDeposit] = useState(false)
   const [showDepositSuccess, setShowDepositSuccess] = useState(false)
   const [batchTotal, setBatchTotal] = useState(0)
+  const [showConfirm, setShowConfirm] = useState(false)
 
   // Fetch real data from OkeKirim API
   const [apiOrders, setApiOrders] = useState<Order[]>([])
@@ -230,9 +232,31 @@ export default function DepositPage() {
     const file = e.target.files?.[0]
     if (file) {
       setUploadedFile(file.name)
+      // Compress image before storing
       const reader = new FileReader()
       reader.onload = (ev) => {
-        setUploadedImage(ev.target?.result as string)
+        const img = new window.Image()
+        img.onload = () => {
+          const canvas = document.createElement("canvas")
+          const maxSize = 800
+          let { width, height } = img
+          if (width > maxSize || height > maxSize) {
+            if (width > height) {
+              height = (height / width) * maxSize
+              width = maxSize
+            } else {
+              width = (width / height) * maxSize
+              height = maxSize
+            }
+          }
+          canvas.width = width
+          canvas.height = height
+          const ctx = canvas.getContext("2d")
+          ctx?.drawImage(img, 0, 0, width, height)
+          const compressed = canvas.toDataURL("image/jpeg", 0.7)
+          setUploadedImage(compressed)
+        }
+        img.src = ev.target?.result as string
       }
       reader.readAsDataURL(file)
     }
@@ -419,7 +443,7 @@ export default function DepositPage() {
           <Button
             className="w-full h-14 rounded-xl bg-primary text-primary-foreground font-semibold text-base shadow-lg shadow-primary/25"
             disabled={!uploadedFile || isSubmittingDeposit}
-            onClick={handleSubmitDeposit}
+            onClick={() => setShowConfirm(true)}
           >
             {isSubmittingDeposit ? (
               <div className="flex items-center gap-2">
@@ -629,7 +653,7 @@ export default function DepositPage() {
           <Button
             className="w-full h-14 rounded-xl bg-primary text-primary-foreground font-semibold text-base shadow-lg shadow-primary/25"
             disabled={!uploadedFile || isSubmittingDeposit}
-            onClick={handleSubmitDeposit}
+            onClick={() => setShowConfirm(true)}
           >
             {isSubmittingDeposit ? (
               <div className="flex items-center gap-2">
@@ -1099,6 +1123,21 @@ export default function DepositPage() {
           </>
         )}
       </div>
+
+      {/* Confirm Dialog */}
+      <ConfirmDialog
+        open={showConfirm}
+        title="Konfirmasi Setoran"
+        message={`Yakin mau bayar setoran${showBatchPayment ? ` ${selectedOrders.length} orderan` : ''} sebesar Rp ${(showBatchPayment ? batchTotal : ((selectedOrder as Order | null)?.sisa || 0)).toLocaleString("id-ID")}?`}
+        confirmText="Ya, Bayar"
+        cancelText="Batal"
+        onConfirm={() => {
+          setShowConfirm(false)
+          handleSubmitDeposit()
+        }}
+        onCancel={() => setShowConfirm(false)}
+      />
     </div>
   )
 }
+

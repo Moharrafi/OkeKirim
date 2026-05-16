@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from "next/server"
 import pool from "@/lib/db"
+import { isRateLimited, rateLimitedResponse, getClientIp } from "@/lib/api-auth"
 
 export async function POST(request: NextRequest) {
+  const ip = getClientIp(request)
+  if (isRateLimited(ip, 10, 60000)) {
+    return rateLimitedResponse()
+  }
+
   try {
     const body = await request.json()
-    const { ids, paymentNotes } = body
+    const { ids, paymentNotes, amount } = body
 
     // Support single id or array of ids (batch)
     const scheduleIds: number[] = Array.isArray(ids) ? ids : [ids]
@@ -16,26 +22,37 @@ export async function POST(request: NextRequest) {
     const now = new Date().toISOString().slice(0, 19).replace("T", " ")
 
     for (const id of scheduleIds) {
-      // Get current schedule to calculate full payment
       const [rows] = await pool.execute(
-        "SELECT companyShare FROM schedules WHERE id = ?",
+        "SELECT companyShare, paidCompanyAmount FROM schedules WHERE id = ?",
         [id]
       ) as any
 
       if (rows.length === 0) continue
 
       const companyShare = rows[0].companyShare
+      const currentPaid = rows[0].paidCompanyAmount || 0
 
-      // Update to lunas
+      // If amount specified, do partial payment. Otherwise full payment.
+      const payAmount = amount ? Math.min(Number(amount), companyShare - currentPaid) : (companyShare - currentPaid)
+      const newPaidTotal = currentPaid + payAmount
+      const isFullyPaid = newPaidTotal >= companyShare
+
       await pool.execute(
         `UPDATE schedules 
-         SET status = 'lunas', 
+         SET status = ?, 
              paidCompanyAmount = ?, 
              lastPaidAt = ?, 
              paidOffAt = ?, 
              payment_notes = ?
          WHERE id = ?`,
-        [companyShare, now, now, paymentNotes || "Lunas", id]
+        [
+          isFullyPaid ? "lunas" : "nunggak",
+          newPaidTotal,
+          now,
+          isFullyPaid ? now : null,
+          paymentNotes || (isFullyPaid ? "Lunas" : `Cicil Rp ${payAmount.toLocaleString("id-ID")}`),
+          id,
+        ]
       )
     }
 

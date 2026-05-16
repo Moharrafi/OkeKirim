@@ -27,9 +27,12 @@ function setCache(key: string, data: unknown) {
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const filter = searchParams.get("filter") // "pending" | "paid" | "all"
-  const driver = searchParams.get("driver") // filter by driver name
+  const driver = searchParams.get("driver")
+  const page = parseInt(searchParams.get("page") || "1")
+  const limit = parseInt(searchParams.get("limit") || "50")
+  const offset = (page - 1) * limit
 
-  const cacheKey = `tarikan_${filter}_${driver}`
+  const cacheKey = `tarikan_${filter}_${driver}_${page}_${limit}`
   const cached = getCached(cacheKey)
   if (cached) {
     return NextResponse.json(cached)
@@ -41,7 +44,9 @@ export async function GET(request: NextRequest) {
       FROM schedules s 
       LEFT JOIN drivers d ON LOWER(TRIM(s.driver)) = LOWER(TRIM(d.name))
     `
+    let countQuery = `SELECT COUNT(*) as total FROM schedules s`
     const params: string[] = []
+    const countParams: string[] = []
     const conditions: string[] = []
 
     if (filter === "pending") {
@@ -53,24 +58,32 @@ export async function GET(request: NextRequest) {
     if (driver) {
       conditions.push("s.driver LIKE ?")
       params.push(`%${driver}%`)
+      countParams.push(`%${driver}%`)
     }
 
     if (conditions.length > 0) {
-      query += " WHERE " + conditions.join(" AND ")
+      const whereClause = " WHERE " + conditions.join(" AND ")
+      query += whereClause
+      countQuery += whereClause
     }
 
-    query += " ORDER BY s.id DESC"
+    query += ` ORDER BY s.id DESC LIMIT ${limit} OFFSET ${offset}`
 
     const [rows] = await pool.execute(query, params)
+    const [countRows] = await pool.execute(countQuery, countParams) as any
 
     const schedules = (rows as Array<Record<string, unknown>>).map(row => ({
       ...row,
       vehicle: row.vehicle || row.driverVehicle || null,
     }))
 
+    const total = countRows[0]?.total || 0
     const responseData = {
       schedules,
       count: schedules.length,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
     }
 
     setCache(cacheKey, responseData)
