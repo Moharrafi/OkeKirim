@@ -218,6 +218,8 @@ export default function DepositPage() {
       setShowBatchPayment(false)
       setUploadedFile(null)
       setUploadedImage(null)
+      // Refresh data - hapus orderan yang sudah dibayar dari list
+      setApiOrders(prev => prev.filter(o => !orderIds.includes(parseInt(o.driverId))))
     }, 2000)
   }
 
