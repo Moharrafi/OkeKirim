@@ -60,8 +60,9 @@ export function DebtReminder() {
   if (!show || pendingCount === 0) return null
 
   return (
-    <div className="fixed inset-0 z-[90] flex items-start justify-center p-4 pt-20 pointer-events-none">
-      <div className="w-full max-w-sm pointer-events-auto animate-in slide-in-from-top-4 duration-300">
+    <div className="fixed inset-0 z-[90] flex items-start justify-center p-4 pt-20">
+      <div className="fixed inset-0 bg-black/20 backdrop-blur-[2px]" onClick={handleDismiss} />
+      <div className="relative w-full max-w-sm animate-in slide-in-from-top-4 duration-300">
         <div className="bg-card border border-warning/30 rounded-2xl p-4 shadow-xl">
           <div className="flex items-start gap-3">
             <div className="p-2 rounded-xl bg-warning/10 shrink-0">
