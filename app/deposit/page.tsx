@@ -58,6 +58,13 @@ export default function DepositPage() {
   const { isAdmin, isDriver, user, isAuthenticated } = useUser()
   const [mainTab, setMainTab] = useState<MainTab>("orderan")
   
+  // Read tab from URL params (e.g. /deposit?tab=setoran)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const tab = params.get("tab")
+    if (tab === "setoran") setMainTab("setoran")
+  }, [])
+
   useEffect(() => {
     if (!isAuthenticated) {
       router.push("/login")

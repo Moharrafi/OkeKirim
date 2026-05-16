@@ -54,14 +54,14 @@ export function DebtReminder() {
   const handleAction = () => {
     setShow(false)
     setDismissed(true)
-    router.push("/deposit")
+    router.push("/deposit?tab=setoran")
   }
 
   if (!show || pendingCount === 0) return null
 
   return (
-    <div className="fixed inset-0 z-[90] flex items-end justify-center p-4 pb-24 pointer-events-none">
-      <div className="w-full max-w-sm pointer-events-auto animate-in slide-in-from-bottom-4 duration-300">
+    <div className="fixed inset-0 z-[90] flex items-start justify-center p-4 pt-20 pointer-events-none">
+      <div className="w-full max-w-sm pointer-events-auto animate-in slide-in-from-top-4 duration-300">
         <div className="bg-card border border-warning/30 rounded-2xl p-4 shadow-xl">
           <div className="flex items-start gap-3">
             <div className="p-2 rounded-xl bg-warning/10 shrink-0">
