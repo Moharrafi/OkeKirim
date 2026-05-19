@@ -9,6 +9,7 @@ import {
   Users,
   Car,
   TrendingUp,
+  Wrench,
   ArrowUpRight,
   ArrowDownRight,
   ChevronRight,
@@ -115,7 +116,7 @@ export default function DashboardPage() {
     ? [
         { label: "Input Orderan", href: "/deposit", icon: Wallet, color: "bg-primary" },
         { label: "Cek Lokasi", href: "/lokasi", icon: Car, color: "bg-chart-2" },
-        { label: "Riwayat", href: "/history", icon: TrendingUp, color: "bg-chart-3" },
+        { label: "Service", href: "/service", icon: Wrench, color: "bg-chart-3" },
       ]
     : [
         { label: "Setor", href: "/deposit", icon: Wallet, color: "bg-primary" },
