@@ -417,6 +417,52 @@ export default function DepositPage() {
             </CardContent>
           </Card>
 
+          {/* Bayar Sebagian Toggle - Batch */}
+          <Card className="border-border bg-card">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <Label className="text-sm font-medium text-foreground">Bayar Sebagian</Label>
+                <button
+                  onClick={() => { setPayAmount(payAmount ? "" : "0") }}
+                  className={cn(
+                    "relative w-10 h-5 rounded-full transition-colors",
+                    payAmount !== "" ? "bg-primary" : "bg-muted"
+                  )}
+                >
+                  <span className={cn(
+                    "absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform",
+                    payAmount !== "" && "translate-x-5"
+                  )} />
+                </button>
+              </div>
+              {payAmount !== "" && (
+                <div className="mt-3">
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground font-medium text-sm">Rp</span>
+                    <Input
+                      type="number"
+                      placeholder="Masukkan jumlah..."
+                      value={payAmount === "0" ? "" : payAmount}
+                      onChange={(e) => setPayAmount(e.target.value || "0")}
+                      className="bg-secondary border-0 pl-10 h-12 rounded-xl"
+                      autoFocus
+                    />
+                  </div>
+                  {payAmount && parseInt(payAmount) > 0 && parseInt(payAmount) < batchTotal && (
+                    <p className="text-xs text-warning mt-2">
+                      ⚠️ Sisa setelah bayar: Rp {(batchTotal - parseInt(payAmount)).toLocaleString("id-ID")} — orderan terbaru yang belum lunas
+                    </p>
+                  )}
+                </div>
+              )}
+              {payAmount === "" && (
+                <p className="text-xs text-muted-foreground mt-2">
+                  Bayar penuh Rp {batchTotal.toLocaleString("id-ID")}
+                </p>
+              )}
+            </CardContent>
+          </Card>
+
           {/* Upload Bukti Transfer */}
           <Card className="border-border bg-card">
             <CardContent className="p-4">
