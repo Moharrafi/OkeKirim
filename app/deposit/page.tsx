@@ -192,7 +192,7 @@ export default function DepositPage() {
     // Update payment status in database
     try {
       if (orderIds.length > 0) {
-        const partialAmount = payAmount ? parseInt(payAmount) : undefined
+        const partialAmount = (payAmount && payAmount !== "" && payAmount !== "0" && parseInt(payAmount) > 0) ? parseInt(payAmount) : undefined
         await fetch("/api/tarikan/pay", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -240,7 +240,7 @@ export default function DepositPage() {
       setUploadedImage(null)
       setPayAmount("")
       // Refresh data - update atau hapus orderan yang sudah dibayar
-      const partialAmt = payAmount ? parseInt(payAmount) : 0
+      const partialAmt = (payAmount && payAmount !== "" && payAmount !== "0") ? parseInt(payAmount) : 0
       if (partialAmt > 0 && selectedOrder && partialAmt < selectedOrder.sisa) {
         // Partial payment - update sisa
         setApiOrders(prev => prev.map(o => {
@@ -581,23 +581,44 @@ export default function DepositPage() {
           {/* Jumlah Bayar */}
           <Card className="border-border bg-card">
             <CardContent className="p-4">
-              <Label className="text-sm font-medium text-foreground">Jumlah Bayar</Label>
-              <p className="text-xs text-muted-foreground mt-1 mb-3">
-                Kosongkan untuk bayar penuh (Rp {selectedOrder.sisa.toLocaleString("id-ID")})
-              </p>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground font-medium text-sm">Rp</span>
-                <Input
-                  type="number"
-                  placeholder={selectedOrder.sisa.toLocaleString("id-ID")}
-                  value={payAmount}
-                  onChange={(e) => setPayAmount(e.target.value)}
-                  className="bg-secondary border-0 pl-10 h-12 rounded-xl"
-                />
+              <div className="flex items-center justify-between">
+                <Label className="text-sm font-medium text-foreground">Bayar Sebagian</Label>
+                <button
+                  onClick={() => { setPayAmount(payAmount ? "" : "0") }}
+                  className={cn(
+                    "relative w-10 h-5 rounded-full transition-colors",
+                    payAmount !== "" ? "bg-primary" : "bg-muted"
+                  )}
+                >
+                  <span className={cn(
+                    "absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform",
+                    payAmount !== "" && "translate-x-5"
+                  )} />
+                </button>
               </div>
-              {payAmount && parseInt(payAmount) < selectedOrder.sisa && (
-                <p className="text-xs text-warning mt-2">
-                  ⚠️ Bayar sebagian — sisa setelah ini: Rp {(selectedOrder.sisa - parseInt(payAmount)).toLocaleString("id-ID")}
+              {payAmount !== "" && (
+                <div className="mt-3">
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground font-medium text-sm">Rp</span>
+                    <Input
+                      type="number"
+                      placeholder="Masukkan jumlah..."
+                      value={payAmount === "0" ? "" : payAmount}
+                      onChange={(e) => setPayAmount(e.target.value || "0")}
+                      className="bg-secondary border-0 pl-10 h-12 rounded-xl"
+                      autoFocus
+                    />
+                  </div>
+                  {payAmount && parseInt(payAmount) > 0 && parseInt(payAmount) < selectedOrder.sisa && (
+                    <p className="text-xs text-warning mt-2">
+                      ⚠️ Sisa setelah bayar: Rp {(selectedOrder.sisa - parseInt(payAmount)).toLocaleString("id-ID")}
+                    </p>
+                  )}
+                </div>
+              )}
+              {payAmount === "" && (
+                <p className="text-xs text-muted-foreground mt-2">
+                  Bayar penuh Rp {selectedOrder.sisa.toLocaleString("id-ID")}
                 </p>
               )}
             </CardContent>
