@@ -102,6 +102,7 @@ export default function DepositPage() {
   const [editArgo, setEditArgo] = useState("")
   const [editOrigin, setEditOrigin] = useState("")
   const [editDestination, setEditDestination] = useState("")
+  const [payAmount, setPayAmount] = useState("")
 
   // Fetch real data from OkeKirim API
   const [apiOrders, setApiOrders] = useState<Order[]>([])
@@ -191,10 +192,11 @@ export default function DepositPage() {
     // Update payment status in database
     try {
       if (orderIds.length > 0) {
+        const partialAmount = payAmount ? parseInt(payAmount) : undefined
         await fetch("/api/tarikan/pay", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ids: orderIds, paymentNotes: "Lunas" }),
+          body: JSON.stringify({ ids: orderIds, paymentNotes: partialAmount && partialAmount < (selectedOrder?.sisa || 0) ? `Cicil Rp ${partialAmount.toLocaleString("id-ID")}` : "Lunas", amount: partialAmount }),
         })
       }
     } catch {
@@ -204,7 +206,7 @@ export default function DepositPage() {
     // Send Telegram notification
     try {
       const order = selectedOrder || (selectedOrders.length > 0 ? orders.find(o => selectedOrders.includes(o.id)) : null)
-      const totalAmount = showBatchPayment ? batchTotal : (selectedOrder?.sisa || 0)
+      const totalAmount = showBatchPayment ? batchTotal : (payAmount ? parseInt(payAmount) : (selectedOrder?.sisa || 0))
       const driverName = order?.driver || user.name
       const route = order ? `${order.lokasiMuat} → ${order.lokasiBongkar}` : "-"
       const type = order?.type || "online"
@@ -236,8 +238,22 @@ export default function DepositPage() {
       setShowBatchPayment(false)
       setUploadedFile(null)
       setUploadedImage(null)
-      // Refresh data - hapus orderan yang sudah dibayar dari list
-      setApiOrders(prev => prev.filter(o => !orderIds.includes(parseInt(o.driverId))))
+      setPayAmount("")
+      // Refresh data - update atau hapus orderan yang sudah dibayar
+      const partialAmt = payAmount ? parseInt(payAmount) : 0
+      if (partialAmt > 0 && selectedOrder && partialAmt < selectedOrder.sisa) {
+        // Partial payment - update sisa
+        setApiOrders(prev => prev.map(o => {
+          if (orderIds.includes(parseInt(o.driverId))) {
+            return { ...o, paidAmount: o.paidAmount + partialAmt, sisa: o.sisa - partialAmt }
+          }
+          return o
+        }))
+      } else {
+        // Full payment - remove from list
+        setApiOrders(prev => prev.filter(o => !orderIds.includes(parseInt(o.driverId))))
+      }
+      setPayAmount("")
     }, 2000)
   }
 
@@ -559,6 +575,31 @@ export default function DepositPage() {
                   </div>
                 </div>
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Jumlah Bayar */}
+          <Card className="border-border bg-card">
+            <CardContent className="p-4">
+              <Label className="text-sm font-medium text-foreground">Jumlah Bayar</Label>
+              <p className="text-xs text-muted-foreground mt-1 mb-3">
+                Kosongkan untuk bayar penuh (Rp {selectedOrder.sisa.toLocaleString("id-ID")})
+              </p>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground font-medium text-sm">Rp</span>
+                <Input
+                  type="number"
+                  placeholder={selectedOrder.sisa.toLocaleString("id-ID")}
+                  value={payAmount}
+                  onChange={(e) => setPayAmount(e.target.value)}
+                  className="bg-secondary border-0 pl-10 h-12 rounded-xl"
+                />
+              </div>
+              {payAmount && parseInt(payAmount) < selectedOrder.sisa && (
+                <p className="text-xs text-warning mt-2">
+                  ⚠️ Bayar sebagian — sisa setelah ini: Rp {(selectedOrder.sisa - parseInt(payAmount)).toLocaleString("id-ID")}
+                </p>
+              )}
             </CardContent>
           </Card>
 
