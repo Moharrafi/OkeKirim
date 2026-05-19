@@ -129,7 +129,7 @@ export default function DashboardPage() {
 
       <div className="px-4 py-4 space-y-5">
         {/* Balance Card - highlighted hero */}
-        <Card className="bg-primary/[0.15] dark:bg-primary/25 border-primary/30 overflow-hidden relative">
+        <Card className="bg-primary/[0.15] dark:bg-primary/15 border-primary/25 dark:border-primary/20 overflow-hidden relative">
           <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
           <CardContent className="p-5 py-6 relative">
             <div className="flex items-start justify-between">
