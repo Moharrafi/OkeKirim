@@ -22,6 +22,7 @@ export default function DriversPage() {
   const [formName, setFormName] = useState("")
   const [formVehicle, setFormVehicle] = useState("")
   const [formVehicleType, setFormVehicleType] = useState("")
+  const [formStatus, setFormStatus] = useState("aktif")
 
   useEffect(() => {
     if (!isAuthenticated) router.push("/login")
@@ -33,7 +34,7 @@ export default function DriversPage() {
   }, [])
 
   const handleSave = async () => {
-    const body = { name: formName, vehicle: formVehicle, vehicleType: formVehicleType, status: "aktif" }
+    const body = { name: formName, vehicle: formVehicle, vehicleType: formVehicleType, status: formStatus }
     
     if (editingDriver) {
       await fetch(`/api/drivers`, {
@@ -71,6 +72,7 @@ export default function DriversPage() {
     setFormName("")
     setFormVehicle("")
     setFormVehicleType("")
+    setFormStatus("aktif")
   }
 
   const startEdit = (driver: Driver) => {
@@ -78,6 +80,7 @@ export default function DriversPage() {
     setFormName(driver.name)
     setFormVehicle(driver.vehicle || "")
     setFormVehicleType(driver.vehicleType || "")
+    setFormStatus(driver.status || "aktif")
     setShowForm(true)
   }
 
@@ -190,13 +193,49 @@ export default function DriversPage() {
               </div>
               <div>
                 <Label className="text-xs font-medium text-muted-foreground">Jenis Kendaraan</Label>
-                <Input
+                <select
                   value={formVehicleType}
                   onChange={(e) => setFormVehicleType(e.target.value)}
-                  placeholder="Contoh: CDE, CDD, Fuso"
-                  className="bg-secondary border-0 h-10 rounded-xl mt-1"
-                />
+                  className="w-full h-10 rounded-xl mt-1 bg-secondary border-0 px-3 text-sm text-foreground appearance-none"
+                >
+                  <option value="">Pilih jenis...</option>
+                  <option value="CDE">CDE (Engkel)</option>
+                  <option value="CDD">CDD (Double)</option>
+                  <option value="Fuso">Fuso</option>
+                  <option value="Tronton">Tronton</option>
+                  <option value="Pickup">Pickup</option>
+                  <option value="Lainnya">Lainnya</option>
+                </select>
               </div>
+              {editingDriver && (
+                <div>
+                  <Label className="text-xs font-medium text-muted-foreground">Status</Label>
+                  <div className="flex gap-2 mt-1">
+                    <button
+                      onClick={() => setFormStatus("aktif")}
+                      className={cn(
+                        "flex-1 h-10 rounded-xl text-sm font-medium transition-all",
+                        formStatus === "aktif"
+                          ? "bg-success/15 text-success border border-success/30"
+                          : "bg-secondary text-muted-foreground"
+                      )}
+                    >
+                      Aktif
+                    </button>
+                    <button
+                      onClick={() => setFormStatus("nonaktif")}
+                      className={cn(
+                        "flex-1 h-10 rounded-xl text-sm font-medium transition-all",
+                        formStatus === "nonaktif"
+                          ? "bg-destructive/15 text-destructive border border-destructive/30"
+                          : "bg-secondary text-muted-foreground"
+                      )}
+                    >
+                      Tidak Aktif
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
             <div className="flex gap-3 mt-5">
               <Button variant="outline" className="flex-1 h-10 rounded-xl" onClick={resetForm}>
