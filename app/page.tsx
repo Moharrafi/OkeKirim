@@ -80,13 +80,31 @@ export default function DashboardPage() {
   }, [isAuthenticated, router])
 
   useEffect(() => {
+    // Check sessionStorage cache first (valid for 5 minutes)
+    const cacheKey = `dashboard_${isAdmin ? "admin" : user.name}`
+    const cached = sessionStorage.getItem(cacheKey)
+    if (cached) {
+      try {
+        const { data: cachedData, timestamp } = JSON.parse(cached)
+        if (Date.now() - timestamp < 300000) { // 5 minutes
+          setData(cachedData)
+          setLoading(false)
+          return
+        }
+      } catch {}
+    }
+
     const params = new URLSearchParams()
     if (!isAdmin && user.name) {
       params.set("driver", user.name)
     }
     fetch(`/api/dashboard?${params.toString()}`)
       .then((r) => r.json())
-      .then(setData)
+      .then((d) => {
+        setData(d)
+        // Save to cache
+        sessionStorage.setItem(cacheKey, JSON.stringify({ data: d, timestamp: Date.now() }))
+      })
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [isAdmin, user.name])
