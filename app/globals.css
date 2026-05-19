@@ -53,6 +53,7 @@
   --destructive: oklch(0.6 0.22 25);
   --destructive-foreground: oklch(0.96 0 0);
   --border: oklch(0.35 0.005 260);
+  --input: oklch(0.28 0.005 260);
   --input: oklch(0.24 0.005 260);
   --ring: oklch(0.72 0.19 165);
   --chart-1: oklch(0.72 0.19 165);
@@ -107,6 +108,13 @@
     -webkit-tap-highlight-color: transparent;
     -webkit-touch-callout: none;
   }
+}
+
+/* Fix input visibility in dark mode */
+.dark input,
+.dark select,
+.dark [role="combobox"] {
+  border: 1px solid oklch(0.35 0.005 260) !important;
 }
 
 /* Safe area for mobile */
