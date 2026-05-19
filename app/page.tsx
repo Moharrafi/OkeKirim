@@ -211,7 +211,8 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          <Card className="border-border bg-card">
+          <Link href="/drivers">
+          <Card className="border-border bg-card cursor-pointer active:scale-[0.97] transition-transform">
             <CardContent className="p-3.5">
               <div className="flex items-center justify-between">
                 <div className="p-2 rounded-xl bg-chart-2/10">
@@ -231,6 +232,7 @@ export default function DashboardPage() {
               </p>
             </CardContent>
           </Card>
+          </Link>
 
           <Card className="border-border bg-card">
             <CardContent className="p-3.5">
