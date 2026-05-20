@@ -301,12 +301,10 @@ export default function ServicePage() {
             </button>
             {viewNota.startsWith("data:") ? (
               <img src={viewNota} alt="Nota Service" className="w-full rounded-2xl shadow-2xl" />
+            ) : viewNota.startsWith("http") ? (
+              <img src={viewNota} alt="Nota Service" className="w-full rounded-2xl shadow-2xl" />
             ) : (
-              <div className="bg-card rounded-2xl p-6 text-center">
-                <Wrench className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
-                <p className="text-sm text-muted-foreground">Nota tersimpan sebagai file lama</p>
-                <p className="text-xs text-muted-foreground mt-1">{viewNota}</p>
-              </div>
+              <img src={`https://okekirim-admin-production.up.railway.app/${viewNota}`} alt="Nota Service" className="w-full rounded-2xl shadow-2xl" />
             )}
           </div>
         </div>
