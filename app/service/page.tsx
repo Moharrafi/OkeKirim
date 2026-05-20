@@ -37,6 +37,7 @@ export default function ServicePage() {
   const [formStatus, setFormStatus] = useState("terjadwal")
   const [formNota, setFormNota] = useState<string | null>(null)
   const [formNotaName, setFormNotaName] = useState("")
+  const [formNotes, setFormNotes] = useState("")
   const [filter, setFilter] = useState<"active" | "done">("active")
   const [drivers, setDrivers] = useState<Array<{ id: number; name: string; vehicle: string | null; status: string }>>([])
 
@@ -59,10 +60,11 @@ export default function ServicePage() {
 
   const handleSave = async () => {
     const driverForVehicle = drivers.find(d => d.vehicle === formVehicle)
+    const serviceType = formType === "Lainnya" && formNotes ? formNotes : formType
     const body = {
       vehicle: formVehicle,
       driver: driverForVehicle?.name || null,
-      type: formType,
+      type: serviceType,
       date: formDate,
       cost: parseInt(formCost || "0"),
       status: formStatus,
@@ -86,6 +88,10 @@ export default function ServicePage() {
     const res = await fetch("/api/services")
     const data = await res.json()
     setServices(data.services || [])
+    // If status changed to selesai, switch to selesai tab
+    if (editingService && formStatus === "selesai" && editingService.status !== "selesai") {
+      setFilter("done")
+    }
     resetForm()
   }
 
@@ -109,12 +115,21 @@ export default function ServicePage() {
     setFormStatus("terjadwal")
     setFormNota(null)
     setFormNotaName("")
+    setFormNotes("")
   }
 
   const startEdit = (service: Service) => {
     setEditingService(service)
     setFormVehicle(service.vehicle || "")
-    setFormType(service.type || "")
+    // Check if type is a custom one (not in predefined list)
+    const predefined = ["Ganti Oli", "Ganti Ban", "Tune Up", "Rem", "AC", "Kelistrikan", "Body Repair"]
+    if (service.type && !predefined.includes(service.type)) {
+      setFormType("Lainnya")
+      setFormNotes(service.type)
+    } else {
+      setFormType(service.type || "")
+      setFormNotes("")
+    }
     setFormDate(service.date || "")
     setFormCost(String(service.cost || ""))
     setFormStatus(service.status || "terjadwal")
@@ -292,6 +307,12 @@ export default function ServicePage() {
                   <option value="Lainnya">Lainnya</option>
                 </select>
               </div>
+              {formType === "Lainnya" && (
+                <div>
+                  <Label className="text-xs font-medium text-muted-foreground">Keterangan Perbaikan</Label>
+                  <Input value={formNotes} onChange={(e) => setFormNotes(e.target.value)} placeholder="Jelaskan jenis perbaikan..." className="bg-secondary border-0 h-10 rounded-xl mt-1" />
+                </div>
+              )}
               <div>
                 <Label className="text-xs font-medium text-muted-foreground">Tanggal</Label>
                 <Input type="date" value={formDate} onChange={(e) => setFormDate(e.target.value)} className="bg-secondary border-0 h-10 rounded-xl mt-1" />
