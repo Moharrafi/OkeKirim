@@ -291,15 +291,23 @@ export default function ServicePage() {
       {/* View Nota Modal */}
       {viewNota && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
-          <div className="fixed inset-0 bg-black/60" onClick={() => setViewNota(null)} />
+          <div className="fixed inset-0 bg-black/70" onClick={() => setViewNota(null)} />
           <div className="relative w-full max-w-sm animate-in zoom-in-95 duration-200">
             <button
               onClick={() => setViewNota(null)}
-              className="absolute -top-10 right-0 p-2 rounded-full bg-card/80 text-foreground"
+              className="absolute -top-12 right-0 p-2 rounded-full bg-card text-foreground shadow-lg"
             >
               <X className="h-5 w-5" />
             </button>
-            <img src={viewNota} alt="Nota Service" className="w-full rounded-2xl shadow-2xl" />
+            {viewNota.startsWith("data:") ? (
+              <img src={viewNota} alt="Nota Service" className="w-full rounded-2xl shadow-2xl" />
+            ) : (
+              <div className="bg-card rounded-2xl p-6 text-center">
+                <Wrench className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
+                <p className="text-sm text-muted-foreground">Nota tersimpan sebagai file lama</p>
+                <p className="text-xs text-muted-foreground mt-1">{viewNota}</p>
+              </div>
+            )}
           </div>
         </div>
       )}
