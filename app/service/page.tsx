@@ -221,7 +221,7 @@ export default function ServicePage() {
             className="w-full h-10 rounded-xl bg-card border border-border px-3 text-sm text-foreground"
           >
             <option value="">Semua Kendaraan</option>
-            {drivers.filter(d => d.vehicle).map(d => (
+            {drivers.filter(d => d.vehicle && d.status === "aktif").map(d => (
               <option key={d.id} value={d.vehicle!}>{d.vehicle} — {d.name}</option>
             ))}
           </select>
