@@ -37,8 +37,8 @@ export default function ServicePage() {
   const [formStatus, setFormStatus] = useState("terjadwal")
   const [formNota, setFormNota] = useState<string | null>(null)
   const [formNotaName, setFormNotaName] = useState("")
-  const [filter, setFilter] = useState<"all" | "active" | "done">("all")
-  const [drivers, setDrivers] = useState<Array<{ id: number; name: string; vehicle: string | null }>>([])
+  const [filter, setFilter] = useState<"active" | "done">("active")
+  const [drivers, setDrivers] = useState<Array<{ id: number; name: string; vehicle: string | null; status: string }>>([])
 
   useEffect(() => {
     if (!isAuthenticated) router.push("/login")
@@ -151,8 +151,7 @@ export default function ServicePage() {
 
   const filteredServices = services.filter(s => {
     if (filter === "active") return s.status !== "selesai"
-    if (filter === "done") return s.status === "selesai"
-    return true
+    return s.status === "selesai"
   })
 
   if (!isAuthenticated) return null
@@ -165,7 +164,7 @@ export default function ServicePage() {
         {/* Filter + Add */}
         <div className="flex items-center justify-between">
           <div className="flex gap-2">
-            {(["all", "active", "done"] as const).map(f => (
+            {(["active", "done"] as const).map(f => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
@@ -174,7 +173,7 @@ export default function ServicePage() {
                   filter === f ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground"
                 )}
               >
-                {f === "all" ? "Semua" : f === "active" ? "Berlangsung" : "Selesai"}
+                {f === "active" ? "Berlangsung" : "Selesai"}
               </button>
             ))}
           </div>
@@ -274,7 +273,7 @@ export default function ServicePage() {
                 <Label className="text-xs font-medium text-muted-foreground">Kendaraan</Label>
                 <select value={formVehicle} onChange={(e) => setFormVehicle(e.target.value)} className="w-full h-10 rounded-xl mt-1 bg-secondary border-0 px-3 text-sm text-foreground">
                   <option value="">Pilih kendaraan...</option>
-                  {drivers.filter(d => d.vehicle).map(d => (
+                  {drivers.filter(d => d.vehicle && d.status === "aktif").map(d => (
                     <option key={d.id} value={d.vehicle!}>{d.vehicle} — {d.name}</option>
                   ))}
                 </select>
