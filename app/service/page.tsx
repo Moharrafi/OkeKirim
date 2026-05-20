@@ -39,6 +39,7 @@ export default function ServicePage() {
   const [formNotaName, setFormNotaName] = useState("")
   const [formNotes, setFormNotes] = useState("")
   const [filter, setFilter] = useState<"active" | "done">("active")
+  const [viewNota, setViewNota] = useState<string | null>(null)
   const [drivers, setDrivers] = useState<Array<{ id: number; name: string; vehicle: string | null; status: string }>>([])
 
   useEffect(() => {
@@ -258,6 +259,14 @@ export default function ServicePage() {
                               Rp {service.cost.toLocaleString("id-ID")}
                             </span>
                           )}
+                          {service.receipt && (
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setViewNota(service.receipt) }}
+                              className="text-[11px] font-medium text-primary hover:underline"
+                            >
+                              Lihat Nota
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -278,6 +287,22 @@ export default function ServicePage() {
           </div>
         )}
       </div>
+
+      {/* View Nota Modal */}
+      {viewNota && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/60" onClick={() => setViewNota(null)} />
+          <div className="relative w-full max-w-sm animate-in zoom-in-95 duration-200">
+            <button
+              onClick={() => setViewNota(null)}
+              className="absolute -top-10 right-0 p-2 rounded-full bg-card/80 text-foreground"
+            >
+              <X className="h-5 w-5" />
+            </button>
+            <img src={viewNota} alt="Nota Service" className="w-full rounded-2xl shadow-2xl" />
+          </div>
+        </div>
+      )}
 
       {/* Add/Edit Form Modal */}
       {showForm && (
