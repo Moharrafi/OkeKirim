@@ -130,7 +130,16 @@ export default function ServicePage() {
       setFormType(service.type || "")
       setFormNotes("")
     }
-    setFormDate(service.date || "")
+    // Parse date to YYYY-MM-DD format for input[type=date]
+    if (service.date) {
+      const d = new Date(service.date)
+      const yyyy = d.getFullYear()
+      const mm = String(d.getMonth() + 1).padStart(2, "0")
+      const dd = String(d.getDate()).padStart(2, "0")
+      setFormDate(`${yyyy}-${mm}-${dd}`)
+    } else {
+      setFormDate("")
+    }
     setFormCost(String(service.cost || ""))
     setFormStatus(service.status || "terjadwal")
     setFormNota(service.receipt || null)
@@ -326,7 +335,19 @@ export default function ServicePage() {
               </div>
               <div>
                 <Label className="text-xs font-medium text-muted-foreground">Nota / Kwitansi</Label>
-                {formNotaName ? (
+                {formNota && formNota.startsWith("data:") ? (
+                  <div className="mt-1 space-y-2">
+                    <div className="rounded-xl overflow-hidden border border-border">
+                      <img src={formNota} alt="Nota" className="w-full h-32 object-cover" />
+                    </div>
+                    <div className="flex items-center justify-between p-2 rounded-xl bg-success/10 border border-success/20">
+                      <span className="text-xs text-success font-medium truncate">{formNotaName}</span>
+                      <button onClick={() => { setFormNota(null); setFormNotaName("") }} className="p-1 rounded-full hover:bg-secondary">
+                        <X className="h-3 w-3 text-muted-foreground" />
+                      </button>
+                    </div>
+                  </div>
+                ) : formNotaName ? (
                   <div className="flex items-center justify-between p-2 rounded-xl bg-success/10 border border-success/20 mt-1">
                     <span className="text-xs text-success font-medium truncate">{formNotaName}</span>
                     <button onClick={() => { setFormNota(null); setFormNotaName("") }} className="p-1 rounded-full hover:bg-secondary">
