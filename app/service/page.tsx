@@ -31,12 +31,14 @@ export default function ServicePage() {
   const [showForm, setShowForm] = useState(false)
   const [editingService, setEditingService] = useState<Service | null>(null)
   const [formVehicle, setFormVehicle] = useState("")
-  const [formDriver, setFormDriver] = useState("")
   const [formType, setFormType] = useState("")
   const [formDate, setFormDate] = useState("")
   const [formCost, setFormCost] = useState("")
   const [formStatus, setFormStatus] = useState("terjadwal")
+  const [formNota, setFormNota] = useState<string | null>(null)
+  const [formNotaName, setFormNotaName] = useState("")
   const [filter, setFilter] = useState<"all" | "active" | "done">("all")
+  const [drivers, setDrivers] = useState<Array<{ id: number; name: string; vehicle: string | null }>>([])
 
   useEffect(() => {
     if (!isAuthenticated) router.push("/login")
@@ -48,16 +50,23 @@ export default function ServicePage() {
       .then(data => setServices(data.services || []))
       .catch(() => {})
       .finally(() => setLoading(false))
+    // Fetch drivers for vehicle dropdown
+    fetch("/api/drivers")
+      .then(r => r.json())
+      .then(data => setDrivers(data.drivers || []))
+      .catch(() => {})
   }, [])
 
   const handleSave = async () => {
+    const driverForVehicle = drivers.find(d => d.vehicle === formVehicle)
     const body = {
       vehicle: formVehicle,
-      driver: formDriver,
+      driver: driverForVehicle?.name || null,
       type: formType,
       date: formDate,
       cost: parseInt(formCost || "0"),
       status: formStatus,
+      receipt: formNota || undefined,
     }
 
     if (editingService) {
@@ -94,22 +103,50 @@ export default function ServicePage() {
     setShowForm(false)
     setEditingService(null)
     setFormVehicle("")
-    setFormDriver("")
     setFormType("")
     setFormDate("")
     setFormCost("")
     setFormStatus("terjadwal")
+    setFormNota(null)
+    setFormNotaName("")
   }
 
   const startEdit = (service: Service) => {
     setEditingService(service)
     setFormVehicle(service.vehicle || "")
-    setFormDriver(service.driver || "")
     setFormType(service.type || "")
     setFormDate(service.date || "")
     setFormCost(String(service.cost || ""))
     setFormStatus(service.status || "terjadwal")
+    setFormNota(service.receipt || null)
+    setFormNotaName(service.receipt ? "Nota tersimpan" : "")
     setShowForm(true)
+  }
+
+  const handleNotaUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setFormNotaName(file.name)
+      const reader = new FileReader()
+      reader.onload = (ev) => {
+        const img = new window.Image()
+        img.onload = () => {
+          const canvas = document.createElement("canvas")
+          const maxSize = 600
+          let { width, height } = img
+          if (width > maxSize || height > maxSize) {
+            if (width > height) { height = (height / width) * maxSize; width = maxSize }
+            else { width = (width / height) * maxSize; height = maxSize }
+          }
+          canvas.width = width
+          canvas.height = height
+          canvas.getContext("2d")?.drawImage(img, 0, 0, width, height)
+          setFormNota(canvas.toDataURL("image/jpeg", 0.6))
+        }
+        img.src = ev.target?.result as string
+      }
+      reader.readAsDataURL(file)
+    }
   }
 
   const filteredServices = services.filter(s => {
@@ -137,7 +174,7 @@ export default function ServicePage() {
                   filter === f ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground"
                 )}
               >
-                {f === "all" ? "Semua" : f === "active" ? "Aktif" : "Selesai"}
+                {f === "all" ? "Semua" : f === "active" ? "Berlangsung" : "Selesai"}
               </button>
             ))}
           </div>
@@ -234,12 +271,13 @@ export default function ServicePage() {
             </div>
             <div className="space-y-3">
               <div>
-                <Label className="text-xs font-medium text-muted-foreground">Kendaraan (Plat)</Label>
-                <Input value={formVehicle} onChange={(e) => setFormVehicle(e.target.value)} placeholder="Contoh: B 1234 ABC" className="bg-secondary border-0 h-10 rounded-xl mt-1" />
-              </div>
-              <div>
-                <Label className="text-xs font-medium text-muted-foreground">Driver</Label>
-                <Input value={formDriver} onChange={(e) => setFormDriver(e.target.value)} placeholder="Nama driver" className="bg-secondary border-0 h-10 rounded-xl mt-1" />
+                <Label className="text-xs font-medium text-muted-foreground">Kendaraan</Label>
+                <select value={formVehicle} onChange={(e) => setFormVehicle(e.target.value)} className="w-full h-10 rounded-xl mt-1 bg-secondary border-0 px-3 text-sm text-foreground">
+                  <option value="">Pilih kendaraan...</option>
+                  {drivers.filter(d => d.vehicle).map(d => (
+                    <option key={d.id} value={d.vehicle!}>{d.vehicle} — {d.name}</option>
+                  ))}
+                </select>
               </div>
               <div>
                 <Label className="text-xs font-medium text-muted-foreground">Jenis Service</Label>
@@ -267,22 +305,37 @@ export default function ServicePage() {
                 </div>
               </div>
               <div>
+                <Label className="text-xs font-medium text-muted-foreground">Nota / Kwitansi</Label>
+                {formNotaName ? (
+                  <div className="flex items-center justify-between p-2 rounded-xl bg-success/10 border border-success/20 mt-1">
+                    <span className="text-xs text-success font-medium truncate">{formNotaName}</span>
+                    <button onClick={() => { setFormNota(null); setFormNotaName("") }} className="p-1 rounded-full hover:bg-secondary">
+                      <X className="h-3 w-3 text-muted-foreground" />
+                    </button>
+                  </div>
+                ) : (
+                  <label className="flex items-center justify-center h-10 rounded-xl mt-1 bg-secondary border border-dashed border-border cursor-pointer hover:border-primary/50 transition-colors">
+                    <span className="text-xs text-muted-foreground">Upload foto nota...</span>
+                    <input type="file" accept="image/*" className="hidden" onChange={handleNotaUpload} />
+                  </label>
+                )}
+              </div>
+              <div>
                 <Label className="text-xs font-medium text-muted-foreground">Status</Label>
                 <div className="flex gap-2 mt-1">
-                  {["terjadwal", "proses", "selesai"].map(s => (
+                  {["terjadwal", "selesai"].map(s => (
                     <button
                       key={s}
                       onClick={() => setFormStatus(s)}
                       className={cn(
-                        "flex-1 h-9 rounded-xl text-xs font-medium transition-all capitalize",
+                        "flex-1 h-9 rounded-xl text-xs font-medium transition-all",
                         formStatus === s
                           ? s === "selesai" ? "bg-success/15 text-success border border-success/30"
-                            : s === "proses" ? "bg-warning/15 text-warning border border-warning/30"
-                            : "bg-primary/15 text-primary border border-primary/30"
+                            : "bg-warning/15 text-warning border border-warning/30"
                           : "bg-secondary text-muted-foreground"
                       )}
                     >
-                      {s}
+                      {s === "terjadwal" ? "Berlangsung" : "Selesai"}
                     </button>
                   ))}
                 </div>
@@ -300,3 +353,4 @@ export default function ServicePage() {
     </div>
   )
 }
+
