@@ -174,9 +174,12 @@ export default function ServicePage() {
     }
   }
 
+  const [filterDriver, setFilterDriver] = useState("")
+
   const filteredServices = services.filter(s => {
-    if (filter === "active") return s.status !== "selesai"
-    return s.status === "selesai"
+    const statusMatch = filter === "active" ? s.status !== "selesai" : s.status === "selesai"
+    const driverMatch = !filterDriver || s.driver === filterDriver || s.vehicle === filterDriver
+    return statusMatch && driverMatch
   })
 
   if (!isAuthenticated) return null
@@ -209,6 +212,20 @@ export default function ServicePage() {
             </Button>
           )}
         </div>
+
+        {/* Filter by driver - only on Selesai tab */}
+        {filter === "done" && (
+          <select
+            value={filterDriver}
+            onChange={(e) => setFilterDriver(e.target.value)}
+            className="w-full h-10 rounded-xl bg-card border border-border px-3 text-sm text-foreground"
+          >
+            <option value="">Semua Kendaraan</option>
+            {drivers.filter(d => d.vehicle).map(d => (
+              <option key={d.id} value={d.vehicle!}>{d.vehicle} — {d.name}</option>
+            ))}
+          </select>
+        )}
 
         {/* Service List */}
         {loading ? (
